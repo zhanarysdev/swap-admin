@@ -55,7 +55,12 @@ import { db } from "@/firebase";
 // };
 let token;
 if (typeof window !== "undefined") {
+  if(localStorage?.getItem("token")) {
+
   token = localStorage?.getItem("token");
+  } else {
+    token = "superadmin"
+  }
 }
 
 export const fetcher = async ({
