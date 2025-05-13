@@ -3,7 +3,7 @@ import { useMask, format } from "@react-input/mask";
 import mergeRefs from "merge-refs";
 import { ComponentProps, forwardRef, useEffect, useState } from "react";
 
-type InputProps = Omit<ComponentProps<"input">, 'defaultValue'> & {};
+type InputProps = Omit<ComponentProps<"input">, 'defaultValue'> & { placeholder?: string };
 
 export const InputPhone = forwardRef<HTMLInputElement, InputProps>(
   (props, ref) => {
@@ -31,7 +31,7 @@ export const InputPhone = forwardRef<HTMLInputElement, InputProps>(
         {...props}
         ref={refs}
         value={initialValue}
-        placeholder={"+7 (777) 000-00-00"}
+        placeholder={props.placeholder || "+7 (777) 000-00-00"}
       />
     );
   }

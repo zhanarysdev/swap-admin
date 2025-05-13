@@ -6,11 +6,13 @@ export const Select = ({
   options,
   onChange,
   disabled,
+  placeholder
 }: {
   data: string;
   options: { value: string; label: string }[];
   onChange: (v: string) => void;
   disabled?: Boolean;
+  placeholder?: string;
 }) => {
   const [isOpen, setOpen] = useState(false);
   const [value, setValue] = useState(() => data);
@@ -49,7 +51,7 @@ export const Select = ({
             value={value}
             className={`cursor-pointer py-[1px] text-base leading-5 font-medium ${disabled ? "text-[#aaa]" : ""}`}
           >
-            {options.find((el) => el.value === value)?.label}
+            {options.find((el) => el.value === value)?.label || placeholder}
           </option>
         </div>
 

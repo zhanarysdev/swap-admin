@@ -12,13 +12,15 @@ export default function Signup() {
     const [checked, setChecked] = useState(false);
     const [error, setError] = useState("");
     const [policyError, setPolicyError] = useState(false);
-    const [pageState, setPageState] = useState<"registration" | "verification" | "password" | "form">("form");
+    const [pageState, setPageState] = useState<"registration" | "verification" | "password" | "form">("registration");
     const [password, setPassword] = useState("");
     const [code, setCode] = useState("");
+    const [verificationToken, setVerificationToken] = useState("");
     const submitVerification = async () => {
         const res = await post({ url: "business/v1/number/verification", data: { phone_number: phone, code: code }, custom: true })
         if(res.statusCode === 200) {
             setPageState("form");
+            setVerificationToken(res.result.verification_token);
         }
     }
 
@@ -51,11 +53,11 @@ export default function Signup() {
     }
 
     if(pageState === "verification") {
-        return <Verification code={code} setCode={setCode} submit={submitVerification} setPageState={setPageState} />
+        return <Verification code={code}  setCode={setCode} submit={submitVerification} setPageState={setPageState} />
     }
 
     if(pageState === "form") {
-        return <Form setPageState={setPageState} />
+        return <Form setPageState={setPageState} verificationToken={verificationToken} password={password} />
     }
 
 
