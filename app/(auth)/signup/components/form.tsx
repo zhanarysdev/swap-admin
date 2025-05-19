@@ -5,7 +5,7 @@ import { Input } from "@/components/input/input";
 import { InputPhone } from "@/components/input/input-phone";
 import { Select } from "@/components/select/select";
 import { Spinner } from "@/components/spinner/spinner";
-import { post } from "@/fetcher";
+import { post, fetcher } from "@/fetcher";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -74,23 +74,18 @@ export function Form({ setPageState, verificationToken, password }: {
     }
 
     const { data: categoriesData, isLoading } = useSWR({
-        url: "v1/business/category/list",
+        url: "v1/business/category/list/all",
         data: {
             "search": "",
-            "sort_by": "",
-            "sort_dir": ""
+            "sort_by": "name",
+            "sort_dir": "asc"
         },
         custom: true
     }, post)
 
     const cities = useSWR({
-        url: "city/count",
-        data: {
-            "search": "",
-            "sort_by": "",
-            "sort_dir": ""
-        },
-    }, post)
+        url: "city/list",
+    }, fetcher)
 
     if (isLoading || cities.isLoading) {
         return <Spinner />
@@ -149,7 +144,7 @@ export function Form({ setPageState, verificationToken, password }: {
                         <Select
                             data={value}
                             placeholder="Город"
-                            options={cities.data.result.map((item: any) => ({ label: item.name, value: item.id }))}
+                            options={cities.data.result.map((item: any) => ({ label: item.name?.ru, value: item.id }))}
                             onChange={(val) => onChange(val)}
                         />
                     )}

@@ -79,7 +79,7 @@ export const fetcher = async ({
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        SuperToken: token,
+        BusToken : token,
       },
     }
   ).then((response) => {

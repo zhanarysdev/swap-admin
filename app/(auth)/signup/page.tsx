@@ -29,7 +29,6 @@ export default function Signup() {
     }
 
     const submit = async () => {
-        console.log(phone.length)
         if (phone.length !== 18) {
             return setError("Введите корректный номер телефона");
         } else {

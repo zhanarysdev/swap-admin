@@ -62,7 +62,8 @@
 
    const { data, isLoading } = useSWR(
      {
-       url: `tasks?page=1&search=${debouncedSearch}&sortBy=${context.sortValue}`,
+       url: `business/v1/task/list?page=1`,
+       custom: true,
      },
      fetcher
    );
