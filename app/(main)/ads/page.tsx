@@ -15,6 +15,13 @@ import { StepFive } from "./components/step-five";
 import { StepSix } from "./components/step-six";
 import useSWR from "swr";
 import { fetcher } from "@/fetcher";
+
+
+const stepLabel = {
+  1: "Информация",
+  2: "Срок акции и время посещения"
+}
+
 export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
@@ -47,12 +54,12 @@ export default function AdsPage() {
       <Table />
       {isOpen &&
         createPortal(
-          <Modal label={"Информация"} close={() => setIsOpen(false)}>
+          <Modal label={stepLabel[step]} close={() => setIsOpen(false)}>
             <div>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 {step === 1 && <StepOne form={form} />}
-                {/* {step === 2 && <StepTwo form={form} />}
-                {step === 3 && <StepThree form={form} />}
+                {step === 2 && <StepTwo form={form} />}
+                {/* {step === 3 && <StepThree form={form} />}
                 {step === 4 && <StepFour form={form} />}
                 {step === 5 && <StepFive form={form} />}
                 {step === 6 && <StepSix form={form} />} */}

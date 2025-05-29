@@ -1,16 +1,16 @@
-import { Label } from "@/components/input/label";
-import { Select } from "@/components/select/select";
-import { Controller, UseFormReturn } from "react-hook-form";
-import { AdFormData } from "./useAdsForm";
 import { Button, ButtonBG } from "@/components/button/button";
-import { Text } from "@/components/input/text";
-import { useState } from "react";
-import { InputFile } from "@/components/input/input-file";
 import { Icon } from "@/components/icons";
-import useSWR from "swr";
-import { fetcher, post } from "@/fetcher";
+import { InputFile } from "@/components/input/input-file";
+import { Label } from "@/components/input/label";
+import { Text } from "@/components/input/text";
+import { Select } from "@/components/select/select";
 import { Spinner } from "@/components/spinner/spinner";
 import useProfile from "@/components/useProfile";
+import { post } from "@/fetcher";
+import { useState } from "react";
+import { Controller, UseFormReturn } from "react-hook-form";
+import useSWR from "swr";
+import { AdFormData } from "./useAdsForm";
 
 export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
   const [count, setCount] = useState(0);
@@ -30,7 +30,6 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
   );
 
   if (isLoading || isProfileLoading) return <Spinner />;
-  console.log(profile);
 
   return (
     <div className="flex gap-6">
