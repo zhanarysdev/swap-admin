@@ -19,7 +19,8 @@ import { fetcher } from "@/fetcher";
 
 const stepLabel = {
   1: "Информация",
-  2: "Срок акции и время посещения"
+  2: "Срок акции и время посещения",
+  3: "Задания для инфлюэнсеров"
 }
 
 export default function AdsPage() {
@@ -59,8 +60,8 @@ export default function AdsPage() {
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 {step === 1 && <StepOne form={form} />}
                 {step === 2 && <StepTwo form={form} />}
-                {/* {step === 3 && <StepThree form={form} />}
-                {step === 4 && <StepFour form={form} />}
+                {step === 3 && <StepThree form={form} />}
+                {/* {step === 4 && <StepFour form={form} />}
                 {step === 5 && <StepFive form={form} />}
                 {step === 6 && <StepSix form={form} />} */}
               </form>
