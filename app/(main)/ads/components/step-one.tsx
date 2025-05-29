@@ -10,9 +10,11 @@ import { Icon } from "@/components/icons";
 import useSWR from "swr";
 import { fetcher, post } from "@/fetcher";
 import { Spinner } from "@/components/spinner/spinner";
+import useProfile from "@/components/useProfile";
 
 export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
   const [count, setCount] = useState(0);
+  const { profile, isLoading: isProfileLoading } = useProfile();
 
   const { data, isLoading } = useSWR(
     {
@@ -27,8 +29,8 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
     post
   );
 
-  if (isLoading) return <Spinner />;
-  console.log(data);
+  if (isLoading || isProfileLoading) return <Spinner />;
+  console.log(profile);
 
   return (
     <div className="flex gap-6">
@@ -41,6 +43,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
             render={({ field }) => (
               <Select
                 data={String(field.value)}
+                placeholder="Количество инфлюэнсеров (до)"
                 options={[
                   { label: "5", value: "5" },
                   { label: "10", value: "10" },
@@ -59,6 +62,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
             name="category_ids"
             render={({ field }) => (
               <Select
+                placeholder="Категория"
                 data={String(field.value)}
                 options={data.result.map((el) => ({
                   label: el.name,
@@ -100,11 +104,28 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
                 "genders",
                 form.watch("genders").includes("female")
                   ? form
-                      .watch("genders")
-                      .filter((gender) => gender !== "female")
+                    .watch("genders")
+                    .filter((gender) => gender !== "female")
                   : [...form.watch("genders"), "female"]
               );
             }}
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Controller
+            control={form.control}
+            name="branch_ids"
+            render={({ field }) => (
+              <Select
+                data={String(field.value)}
+                placeholder="Филиалы"
+                options={profile?.branches.map((el) => ({
+                  label: el.address,
+                  value: el.id,
+                }))}
+                onChange={field.onChange}
+              />
+            )}
           />
         </div>
         <div className="flex flex-col gap-2">
