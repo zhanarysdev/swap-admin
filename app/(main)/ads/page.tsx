@@ -1,122 +1,88 @@
- "use client";
- import { Button, ButtonBG } from "@/components/button/button";
- import { useDebounce } from "@/components/debuncer";
- import { Header } from "@/components/header/header";
- import { Icon } from "@/components/icons";
- import { Input } from "@/components/input/input";
- import { Label } from "@/components/input/label";
- import { ModalSave } from "@/components/modal/modal-save";
- import Table from "@/components/temp/table";
- import {
-   default_context,
-   TableContext,
- } from "@/components/temp/table-provider";
- import { fetcher, post } from "@/fetcher";
- import { useContext, useEffect, useState } from "react";
- import { useForm } from "react-hook-form";
- import useSWR from "swr";
+"use client";
+import { Button, ButtonBG } from "@/components/button/button";
+import { Header } from "@/components/header/header";
+import { Modal } from "@/components/modal/modal";
+import Table from "@/components/temp/table";
+import { TableContext } from "@/components/temp/table-provider";
+import { useContext, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { StepOne } from "./components/step-one";
+import { AdFormData, useAdForm } from "./components/useAdsForm";
+import { StepTwo } from "./components/step-two";
+import { StepThree } from "./components/step-three";
+import { StepFour } from "./components/step-four";
+import { StepFive } from "./components/step-five";
+import { StepSix } from "./components/step-six";
+import useSWR from "swr";
+import { fetcher } from "@/fetcher";
+export default function AdsPage() {
+  const form = useAdForm();
+  const { setContext } = useContext(TableContext);
+  const [isOpen, setIsOpen] = useState(false);
+  const [step, setStep] = useState(1);
 
- const labels = [
-   {
-     key: "id",
-     title: "ID",
-   },
-   {
-     key: "influencer_amount",
-     title: "Участников",
-   },
-   {
-     key: "budget",
-     title: "Бюджет",
-   },
-   {
-     key: "deadline",
-     title: "Срок",
-   },
-   {
-     key: "publication_type",
-     title: "Тип",
-     rounded: true,
-   },
-   {
-     key: "ad_format",
-     title: "Формат",
-     rounded: true,
-   },
-   {
-     key: "has_restriction",
-     title: "Ограничения",
-     boolean: true,
-   },
-   {
-     key: "status",
-     title: "Статус",
-     status: true,
-   },
- ];
+  const { data, isLoading } = useSWR(
+    { url: `business/v1/task/list?page=1`, custom: true },
+    fetcher
+  );
+  console.log(data);
 
- export default function Ads() {
-   const { context, setContext } = useContext(TableContext);
-   const debouncedSearch = useDebounce(context.search, 500);
-   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    setContext((prev) => ({
+      ...prev,
+      control: {
+        label: "Создать объявление",
+        action: () => setIsOpen(true),
+      },
+    }));
+  }, []);
 
-   const { data, isLoading } = useSWR(
-     {
-       url: `business/v1/task/list?page=1`,
-       custom: true,
-     },
-     fetcher
-   );
+  const onSubmit = (data: AdFormData) => {
+    console.log(data);
+  };
 
-   useEffect(() => {
-     setContext((prev) => ({ ...prev, isLoading }));
-   }, [isLoading]);
-
-   useEffect(() => {
-     if (data?.result) {
-       setContext((prev) => ({
-         ...prev,
-         data: data.result.tasks.map((el) => ({...el, budget: `${el.spent_budget} / ${el.total_budget}`, deadline: `${ new Date(el.start_date).toLocaleDateString()} - ${new Date(el.end_date).toLocaleDateString()}`})),
-         labels: labels,
-         number: true,
-         goTo: "/ads",
-        
-         sort: ["status", "ad_format", "publication_type"],
-         filters:  ["business_name", "deadline", "ad_type", "publication_type", "status"]
-       }));
-     }
-   }, [data]);
-
-   useEffect(() => {
-     return () => {
-       setContext(default_context);
-     };
-   }, []);
-
-   const {register, handleSubmit} = useForm()
-
-   const onSave = async (data: any) => {
-     const res = await post({url: "selection/create", data: {title: data.name, task_ids: context.checked}})
-     if(res.result ==='success') {
-       setOpen(false)
-     }
-   };
-
-   return (
-     <div>
-       <div className="flex justify-between items-start">
-         <Header title={"Объявления"} subTitle={"Информация"} />
-       </div>
-       <Table />
-       {
-         open && <ModalSave label={"Создать подборку"} onSave={handleSubmit(onSave)} close={() => setOpen(false)}>
-           <div className="flex flex-col gap-2">
-             <Label label="Название"/>
-             <Input placeholder="Название" {...register("name")} />
-           </div>
-         </ModalSave>
-       }
-     </div>
-   );
- }
-
+  return (
+    <div>
+      <Header title={"Объявления"} subTitle={"Информация"} />
+      <Table />
+      {isOpen &&
+        createPortal(
+          <Modal label={"Информация"} close={() => setIsOpen(false)}>
+            <div>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                {step === 1 && <StepOne form={form} />}
+                {/* {step === 2 && <StepTwo form={form} />}
+                {step === 3 && <StepThree form={form} />}
+                {step === 4 && <StepFour form={form} />}
+                {step === 5 && <StepFive form={form} />}
+                {step === 6 && <StepSix form={form} />} */}
+              </form>
+              <div className="flex flex-col gap-4 mt-8">
+                <div className="flex gap-2">
+                  {step > 1 && (
+                    <Button
+                      styles="w-full justify-center font-bold"
+                      bg={ButtonBG.grey}
+                      label={"Назад"}
+                      onClick={() => {
+                        setStep(step - 1);
+                      }}
+                    />
+                  )}
+                  <Button
+                    styles="w-full justify-center font-bold"
+                    label={"Далее"}
+                    onClick={() => {
+                      setStep(step + 1);
+                    }}
+                  />
+                </div>
+                <div className="flex justify-center items-center">{step}/7</div>
+              </div>
+            </div>
+          </Modal>,
+          document.getElementById("page-wrapper")
+        )}
+    </div>
+  );
+}

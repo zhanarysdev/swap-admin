@@ -33,6 +33,7 @@ import { Sa } from "./sa";
 import { Drag } from "./drag";
 import { Faq } from "./faq";
 import { Tv } from "./tv";
+import { ImagePlaceholder } from "./image-placeholder";
 const icons = {
   Ads,
   Arrow,
@@ -67,6 +68,7 @@ const icons = {
   Drag,
   Faq,
   Tv,
+  ImagePlaceholder,
 };
 export function Icon({
   className,

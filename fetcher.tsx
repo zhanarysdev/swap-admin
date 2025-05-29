@@ -55,11 +55,10 @@ import { db } from "@/firebase";
 // };
 let token;
 if (typeof window !== "undefined") {
-  if(localStorage?.getItem("token")) {
-
-  token = localStorage?.getItem("token");
+  if (localStorage?.getItem("token")) {
+    token = localStorage?.getItem("token");
   } else {
-    token = "superadmin"
+    token = "jTFrQHy8YauY2vhiV7snHKJKI5ZWEm-3QUg6KPSZwesQ4Ic8ggaDVN42FbqoZbUC";
   }
 }
 
@@ -79,7 +78,7 @@ export const fetcher = async ({
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        BusToken : token,
+        BusToken: token,
       },
     }
   ).then((response) => {
@@ -123,7 +122,7 @@ export const postFile = async ({ url, data, custom = false }) => {
         Accept: "application/json",
         SuperToken: token,
       },
-      body: (data),
+      body: data,
     }
   ).then((response) => {
     if (!response.ok) {

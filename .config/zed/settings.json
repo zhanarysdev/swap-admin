@@ -1,0 +1,7 @@
+{
+  "cursor_smooth_caret_animation": true,
+  "editor": {
+    "smooth_scrolling": true,
+    "cursor_surrogate_style": "smooth"
+  }
+}
