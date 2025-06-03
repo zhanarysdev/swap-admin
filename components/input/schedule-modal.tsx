@@ -17,9 +17,11 @@ export function ScheduleModal({
     const [tempSchedule, setTempSchedule] = useState(schedule);
 
     const handleTimeChange = (day: string, type: 'open' | 'close', value: string) => {
-        setTempSchedule(prev => prev.map(item =>
+        const newSchedule = tempSchedule.map(item =>
             item.week_day === day ? { ...item, [type === 'open' ? 'open_time' : 'close_time']: value } : item
-        ));
+        );
+        setTempSchedule(newSchedule);
+        onChange(newSchedule);
     };
 
     return (
@@ -73,7 +75,9 @@ export function ScheduleModal({
                             <div className="text-base text-white w-32">{weekDaysMap[el.week_day.toLowerCase()] || el.week_day}</div>
                             <div className="flex gap-2 items-center">
                                 <TimePicker
-                                    onChange={val => handleTimeChange(el.week_day, 'open', val as string)}
+                                    onChange={val => {
+                                        handleTimeChange(el.week_day, 'open', val as string)
+                                    }}
                                     value={el.open_time}
                                     format="HH:mm"
                                     disableClock={true}

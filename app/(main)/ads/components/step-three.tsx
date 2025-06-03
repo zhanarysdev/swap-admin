@@ -25,17 +25,17 @@ export const StepThree = ({ form }) => {
               }}
             />
             <Button
-              label="Stories"
+              label="Story"
               styles="w-full items-center justify-center"
               bg={
-                form.watch("publication_type") === "stories"
+                form.watch("publication_type") === "story"
                   ? ButtonBG.primary
                   : ButtonBG.grey
               }
               onClick={() => {
                 form.setValue(
                   "publication_type",
-                  form.watch("publication_type") === "stories" ? "" : "stories"
+                  form.watch("publication_type") === "story" ? "" : "story"
                 );
               }}
             />
@@ -115,14 +115,14 @@ export const StepThree = ({ form }) => {
               label="Одиночное"
               styles="w-full items-center justify-center"
               bg={
-                form.watch("tag_type") === "only_tag"
+                form.watch("tag_type") === "separate"
                   ? ButtonBG.primary
                   : ButtonBG.grey
               }
               onClick={() => {
                 form.setValue(
                   "tag_type",
-                  form.watch("tag_type") === "only_tag" ? "" : "only_tag"
+                  form.watch("tag_type") === "separate" ? "" : "separate"
                 );
               }}
             />

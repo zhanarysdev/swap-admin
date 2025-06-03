@@ -16,6 +16,14 @@ import { StepSix } from "./components/step-six";
 import useSWR from "swr";
 import { fetcher } from "@/fetcher";
 
+interface WorkHours {
+  open: string;
+  close: string;
+}
+
+interface WorkHoursByWeekDay {
+  [key: string]: WorkHours;
+}
 
 const stepLabel = {
   1: "Информация",
@@ -56,17 +64,63 @@ const isStepValid = (step: number, form: any) => {
 
       return stepOneValid;
     case 2:
-      return !errors.start_date &&
-        !errors.end_date &&
-        !errors.work_hours_by_week_day;
+      // Debug step two validation
+      console.log('Step 2 Validation:', {
+        start_date: values.start_date,
+        end_date: values.end_date,
+        work_hours_by_week_day: values.work_hours_by_week_day,
+        session_duration_sec: values.session_duration_sec,
+        visit_at_same_time_count: values.visit_at_same_time_count,
+        errors: errors
+      });
+
+      // Check if all required fields are filled
+      const hasValidDates = values.start_date && values.end_date;
+      const hasValidSessionDuration = values.session_duration_sec > 0;
+      const hasValidVisitCount = values.visit_at_same_time_count > 0;
+      const hasValidWorkHours = values.work_hours_by_week_day &&
+        Object.values(values.work_hours_by_week_day as WorkHoursByWeekDay).every(day =>
+          day.open && day.close
+        );
+
+      return hasValidDates && hasValidSessionDuration && hasValidVisitCount && hasValidWorkHours;
     case 3:
-      return !errors.publication_type &&
-        !errors.ad_format &&
-        !errors.content_type_id &&
-        !errors.clothing_type_id;
+      // Debug step three validation
+      console.log('Step 3 Validation:', {
+        publication_type: values.publication_type,
+        ad_format: values.ad_format,
+        tag_type: values.tag_type,
+        errors: errors
+      });
+
+      // Check if all required fields are filled
+      const hasValidPublicationType = values.publication_type &&
+        ['reels', 'post', 'story'].includes(values.publication_type);
+      const hasValidAdFormat = values.ad_format &&
+        ['image', 'video', 'reels'].includes(values.ad_format);
+      const hasValidTagType = values.tag_type &&
+        ['together_with_influencer', 'separate'].includes(values.tag_type);
+
+      return hasValidPublicationType &&
+        hasValidAdFormat &&
+        hasValidTagType;
     case 4:
-      return !errors.reward_by_rank &&
-        values.reward_by_rank.length > 0;
+      // Debug step four validation
+      console.log('Step 4 Validation:', {
+        reward_by_rank: values.reward_by_rank,
+        errors: errors
+      });
+
+      // Check if reward_by_rank is valid
+      const hasValidRewards = values.reward_by_rank &&
+        Array.isArray(values.reward_by_rank) &&
+        values.reward_by_rank.length > 0 &&
+        values.reward_by_rank.every(reward =>
+          reward.rank_id &&
+          reward.amount > 0
+        );
+
+      return hasValidRewards;
     case 5:
       return !errors.is_bad_words_allowed &&
         !errors.is_custom_text &&
@@ -80,7 +134,10 @@ export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(4);
+
+  // Add form values watcher
+  const formValues = form.watch();
 
   const { data, isLoading } = useSWR(
     { url: `business/v1/task/list?page=1`, custom: true },
@@ -101,6 +158,7 @@ export default function AdsPage() {
   const onSubmit = (data: AdFormData) => {
     console.log(data);
   };
+  console.log(formValues);
 
   return (
     <div>
@@ -141,6 +199,7 @@ export default function AdsPage() {
                 </div>
                 <div className="flex justify-center items-center">{step}/7</div>
               </div>
+
             </div>
           </Modal>,
           document.getElementById("page-wrapper")

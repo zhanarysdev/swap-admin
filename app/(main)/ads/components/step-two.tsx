@@ -65,6 +65,15 @@ const timeMap = [
   }
 ]
 
+interface WorkHours {
+  open: string;
+  close: string;
+}
+
+interface WorkHoursByWeekDay {
+  [key: string]: WorkHours;
+}
+
 export const StepTwo = ({ form }) => {
   const [showStartCalendar, setShowStartCalendar] = useState(false);
   const [showEndCalendar, setShowEndCalendar] = useState(false);
@@ -72,16 +81,14 @@ export const StepTwo = ({ form }) => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   const handleTimeChange = (day: string, type: 'open' | 'close', value: string) => {
-    const newTimeMap = timeMap.map(item => {
-      if (item.week_day === day) {
-        return {
-          ...item,
-          [type === 'open' ? 'open_time' : 'close_time']: value
-        };
+    const currentHours = form.getValues("work_hours_by_week_day") || {};
+    form.setValue("work_hours_by_week_day", {
+      ...currentHours,
+      [day]: {
+        ...currentHours[day],
+        [type]: value
       }
-      return item;
     });
-    form.setValue("work_hours", newTimeMap);
     setEditingTime(null);
   };
 
@@ -130,11 +137,15 @@ export const StepTwo = ({ form }) => {
                       // Update work hours open time
                       const timeString = formatDate(date);
                       if (timeString) {
-                        const newTimeMap = timeMap.map(day => ({
-                          ...day,
-                          open_time: timeString
-                        }));
-                        form.setValue("work_hours", newTimeMap);
+                        const currentHours = form.getValues("work_hours_by_week_day") || {};
+                        const newHours = Object.keys(currentHours).reduce((acc, day) => ({
+                          ...acc,
+                          [day]: {
+                            ...currentHours[day],
+                            open: timeString
+                          }
+                        }), {});
+                        form.setValue("work_hours_by_week_day", newHours);
                       }
                     }
                     setShowStartCalendar(false);
@@ -164,11 +175,15 @@ export const StepTwo = ({ form }) => {
                       // Update work hours close time
                       const timeString = formatDate(date);
                       if (timeString) {
-                        const newTimeMap = timeMap.map(day => ({
-                          ...day,
-                          close_time: timeString
-                        }));
-                        form.setValue("work_hours", newTimeMap);
+                        const currentHours = form.getValues("work_hours_by_week_day") || {};
+                        const newHours = Object.keys(currentHours).reduce((acc, day) => ({
+                          ...acc,
+                          [day]: {
+                            ...currentHours[day],
+                            close: timeString
+                          }
+                        }), {});
+                        form.setValue("work_hours_by_week_day", newHours);
                       }
                     }
                     setShowEndCalendar(false);
@@ -231,17 +246,18 @@ export const StepTwo = ({ form }) => {
         <div className="flex flex-col gap-2 w-full">
           <Label label="График посещения" />
           <div className="flex flex-col gap-2">
-            {timeMap.map((el) => {
+            {Object.entries(form.watch("work_hours_by_week_day") || {} as WorkHoursByWeekDay).map(([day, hours]) => {
+              const typedHours = hours as WorkHours;
               return (
                 <div
-                  key={el.week_day}
+                  key={day}
                   className="flex justify-between bg-[#383838] rounded-2xl py-[9px] gap-4 items-center px-[25px]"
                 >
-                  <div>{weekDaysMap[el.week_day.toLowerCase()] || el.week_day}</div>
+                  <div>{weekDaysMap[day.toLowerCase()] || day}</div>
                   <div className="flex gap-2 items-center">
-                    <div className="bg-[#212121] px-3 py-2 rounded-2xl w-[70px] text-center">{el.open_time}</div>
+                    <div className="bg-[#212121] px-3 py-2 rounded-2xl w-[70px] text-center">{typedHours.open}</div>
                     -
-                    <div className="bg-[#212121] px-3 py-2 rounded-2xl w-[70px] text-center">{el.close_time}</div>
+                    <div className="bg-[#212121] px-3 py-2 rounded-2xl w-[70px] text-center">{typedHours.close}</div>
                   </div>
                 </div>
               );
@@ -251,9 +267,23 @@ export const StepTwo = ({ form }) => {
         {showScheduleModal && (
           <div onClick={e => e.stopPropagation()}>
             <ScheduleModal
-              schedule={timeMap}
+              schedule={Object.entries(form.watch("work_hours_by_week_day") || {} as WorkHoursByWeekDay).map(([day, hours]) => {
+                const typedHours = hours as WorkHours;
+                return {
+                  week_day: day,
+                  open_time: typedHours.open,
+                  close_time: typedHours.close
+                };
+              })}
               onChange={(newSchedule) => {
-                form.setValue("work_hours", newSchedule);
+                const formattedSchedule = newSchedule.reduce((acc, item) => ({
+                  ...acc,
+                  [item.week_day]: {
+                    open: item.open_time,
+                    close: item.close_time
+                  }
+                }), {} as WorkHoursByWeekDay);
+                form.setValue("work_hours_by_week_day", formattedSchedule);
               }}
               onClose={() => setShowScheduleModal(false)}
               weekDaysMap={weekDaysMapLong}
