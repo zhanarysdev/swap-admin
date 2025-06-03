@@ -1,6 +1,5 @@
 import { Button, ButtonBG } from "@/components/button/button";
 import { Icon } from "@/components/icons";
-import { InputFile } from "@/components/input/input-file";
 import { Label } from "@/components/input/label";
 import { Text } from "@/components/input/text";
 import { Select } from "@/components/select/select";
@@ -11,6 +10,69 @@ import { useState } from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
 import useSWR from "swr";
 import { AdFormData } from "./useAdsForm";
+
+const ImageUploader = ({ value, onChange }: { value: string[], onChange: (urls: string[]) => void }) => {
+  const handleImageUpload = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('https://swapp-admin-stg-414022925388.us-central1.run.app/api/v1/image/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json();
+      return data.url;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      try {
+        const files = Array.from(e.target.files);
+        const uploadedUrls = await Promise.all(
+          files.map(file => handleImageUpload(file))
+        );
+        onChange(uploadedUrls);
+      } catch (error) {
+        console.error('Error handling images:', error);
+      }
+    }
+  };
+
+  return (
+    <div className="w-full">
+      <input
+        type="file"
+        className="hidden"
+        id="fileInput"
+        multiple
+        onChange={handleFileChange}
+      />
+      <label
+        htmlFor="fileInput"
+        className="bg-[#333333] w-[242px] h-[198px] gap-2 items-center justify-center cursor-pointer flex w-full placeholder:text-grey rounded-2xl py-[15px] px-[25px] text-base leading-5 font-medium"
+      >
+        {value.length > 0 ? (
+          `${value.length} файлов выбрано`
+        ) : (
+          <>
+            <Icon name="Upload" />
+            <span className="text-[#AAAAAA]">Загрузить фото</span>
+          </>
+        )}
+      </label>
+    </div>
+  );
+};
 
 export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
   const [count, setCount] = useState(0);
@@ -154,10 +216,8 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
               control={form.control}
               name="images"
               render={({ field }) => (
-                <InputFile
-                  value={
-                    Array.isArray(field.value) ? (field.value as File[]) : []
-                  }
+                <ImageUploader
+                  value={field.value || []}
                   onChange={field.onChange}
                 />
               )}
@@ -165,16 +225,14 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
           </div>
           <div className="flex gap-2">
             {[...Array(3)].map((_, index) => {
-              const image = form.watch("images")[index];
+              const imageUrl = form.watch("images")[index];
               return (
                 <div key={index} className="w-[75px] h-[75px] relative">
-                  {image ? (
+                  {imageUrl ? (
                     <>
                       <button
                         onClick={() => {
-                          const newImages = (
-                            form.getValues("images") as File[]
-                          ).filter((_, i) => i !== index);
+                          const newImages = form.getValues("images").filter((_, i) => i !== index);
                           form.setValue("images", newImages);
                         }}
                         className="absolute top-[4px] right-[4px] bg-black rounded-full p-1 w-[18px] h-[18px] flex items-center justify-center"
@@ -182,7 +240,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
                         <Icon name="Close" />
                       </button>
                       <img
-                        src={URL.createObjectURL(image as Blob)}
+                        src={imageUrl}
                         alt="Фото"
                         className="w-full h-full object-cover rounded-xl"
                       />

@@ -137,7 +137,7 @@ export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(7);
+  const [step, setStep] = useState(1);
 
   // Add form values watcher
   const formValues = form.watch();

@@ -1,16 +1,21 @@
 import { Input } from "@/components/input/input";
 import { Label } from "@/components/input/label";
+import { Spinner } from "@/components/spinner/spinner";
 import useProfile from "@/components/useProfile";
+import { useEffect } from "react";
 export const StepSeven = ({ form }) => {
 
   const { profile, isLoading, isError, mutate } = useProfile();
+
+
+  if (isLoading) return <Spinner />
 
   return (
     <div className="flex flex-col gap-4">
 
       <div className="flex flex-col gap-2 w-full">
         <Label label="Инфлюэнсеров" />
-        <Input value={form.watch("influencers")} disabled />
+        <Input value={form.watch("influencer_amount")} disabled />
       </div>
 
       <div className="flex flex-col gap-2 w-full">
@@ -20,12 +25,12 @@ export const StepSeven = ({ form }) => {
 
       <div className="flex flex-col gap-2 w-full">
         <Label label="Бюджет кампании" />
-        <Input value={form.watch("influencers")} disabled />
+        <Input value={"От 10000тг до 1000000тг"} disabled />
       </div>
 
       <div className="flex flex-col gap-2 w-full">
         <Label label="Введите сумму пополнения" />
-        <Input value={form.watch("influencers")} disabled />
+        <Input value={form.watch("influencers")} />
       </div>
     </div>
   );
