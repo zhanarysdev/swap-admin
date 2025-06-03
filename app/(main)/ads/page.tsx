@@ -13,6 +13,7 @@ import { StepThree } from "./components/step-three";
 import { StepFour } from "./components/step-four";
 import { StepFive } from "./components/step-five";
 import { StepSix } from "./components/step-six";
+import { StepSeven } from "./components/step-seven";
 import useSWR from "swr";
 import { fetcher } from "@/fetcher";
 
@@ -30,7 +31,9 @@ const stepLabel = {
   2: "Срок акции и время посещения",
   3: "Задания для инфлюэнсеров",
   4: "Вознаграждение",
-  5: "Условия"
+  5: "Условия",
+  6: "Предпросмотр",
+  7: "Формирование счета"
 }
 
 const isStepValid = (step: number, form: any) => {
@@ -134,7 +137,7 @@ export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(4);
+  const [step, setStep] = useState(7);
 
   // Add form values watcher
   const formValues = form.watch();
@@ -175,6 +178,7 @@ export default function AdsPage() {
                 {step === 4 && <StepFour form={form} />}
                 {step === 5 && <StepFive form={form} />}
                 {step === 6 && <StepSix form={form} />}
+                {step === 7 && <StepSeven form={form} />}
               </form>
               <div className="flex flex-col gap-4 mt-8">
                 <div className="flex gap-2">

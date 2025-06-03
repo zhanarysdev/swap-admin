@@ -130,7 +130,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
         <div className="flex flex-col gap-2">
           <Controller
             control={form.control}
-            name="prepared_text"
+            name="about"
             render={({ field }) => (
               <Text
                 count={count}
