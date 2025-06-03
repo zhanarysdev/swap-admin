@@ -22,6 +22,7 @@ export function Button({
   type,
   preIcon,
   styles,
+  disabled,
 }: {
   label: string;
   bg?: ButtonBG;
@@ -29,15 +30,17 @@ export function Button({
   type?: "submit" | "button";
   preIcon?: ReactNode;
   styles?: string;
+  disabled?: boolean;
 }) {
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`${
-        bg == ButtonBG.grey || bg == ButtonBG.red ? "text-white" : "text-black"
-      } 
-      min-h-[44px] gap-2 flex items-center px-4 rounded-2xl ${styles}`}
+      disabled={disabled}
+      className={`${bg == ButtonBG.grey || bg == ButtonBG.red ? "text-white" : "text-black"
+        } 
+      min-h-[44px] gap-2 flex items-center px-4 rounded-2xl ${styles} ${disabled ? "opacity-50 cursor-not-allowed" : ""
+        }`}
       style={{
         backgroundColor:
           ButtonBGValues[ButtonBG[bg] as keyof typeof ButtonBGValues],
