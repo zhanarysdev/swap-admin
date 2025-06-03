@@ -1,10 +1,9 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
 export function InputCalendar({ placeholder, value, onChange }) {
-  const [isOpen, setOpen] = useState(false);
-
   const selectRef = useRef<HTMLDivElement>(null); // Ref to detect outside clicks
 
   useEffect(() => {
@@ -13,7 +12,7 @@ export function InputCalendar({ placeholder, value, onChange }) {
         selectRef.current &&
         !selectRef.current.contains(event.target as Node)
       ) {
-        setOpen(false); // Close dropdown if clicked outside
+        onChange(null); // Close dropdown if clicked outside
       }
     }
 
@@ -21,27 +20,54 @@ export function InputCalendar({ placeholder, value, onChange }) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [onChange]);
+
+  const handleDateChange = (date: Date | null) => {
+    if (date instanceof Date && !isNaN(date.getTime())) {
+      onChange(date);
+    } else {
+      onChange(null);
+    }
+  };
 
   return (
     <div className="relative" ref={selectRef}>
-      <div
-        onClick={() => setOpen(true)}
-        className="bg-[#333333] h-[52px] w-full placeholder:text-grey rounded-2xl py-[15px] px-[25px] text-base leading-5 font-medium cursor-pointer"
-      >
-        {placeholder}
-      </div>
-      {isOpen && (
-        <Calendar
-          onChange={(e) => {
-            onChange(e);
-            setOpen(false);
-          }}
-          value={value}
-          locale="Ru-ru"
-          className={`bg-lightGrey text-base font-semibold leading-5 rounded-2xl absolute top-0 z-10 p-6 w-full`}
-        />
-      )}
+      <style jsx global>{`
+        .react-calendar {
+          background: #333333 !important;
+          color: white !important;
+        }
+        .react-calendar__tile {
+          color: white !important;
+        }
+        .react-calendar__tile--active {
+          background: #BEFF1B !important;
+          color: #212121 !important;
+        }
+        .react-calendar__tile--now {
+          background: #383838 !important;
+        }
+        .react-calendar__tile:enabled:hover,
+        .react-calendar__tile:enabled:focus {
+          background: #383838 !important;
+        }
+        .react-calendar__navigation button {
+          color: white !important;
+        }
+        .react-calendar__navigation button:enabled:hover,
+        .react-calendar__navigation button:enabled:focus {
+          background: #383838 !important;
+        }
+        .react-calendar__month-view__weekdays {
+          color: white !important;
+        }
+      `}</style>
+      <Calendar
+        onChange={handleDateChange}
+        value={value instanceof Date && !isNaN(value.getTime()) ? value : null}
+        locale="Ru-ru"
+        className="bg-[#333333] text-base font-semibold leading-5 rounded-2xl p-6 w-full"
+      />
     </div>
   );
 }

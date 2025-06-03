@@ -1,9 +1,12 @@
-import { Button } from "@/components/button/button";
-import { ButtonBG } from "@/components/button/button";
-import { Label } from "@/components/input/label";
+import { Button, ButtonBG } from "@/components/button/button";
 import { Icon } from "@/components/icons";
-import { Controller } from "react-hook-form";
+import { InputCalendar } from "@/components/input/input-calendar";
+import { Label } from "@/components/input/label";
+import { ScheduleModal } from "@/components/input/schedule-modal";
 import { Select } from "@/components/select/select";
+import { useState } from "react";
+import { Controller } from "react-hook-form";
+
 const weekDaysMap: { [key: string]: string } = {
   'monday': 'Пн',
   'tuesday': 'Вт',
@@ -13,6 +16,17 @@ const weekDaysMap: { [key: string]: string } = {
   'saturday': 'Сб',
   'sunday': 'Вс'
 };
+
+const weekDaysMapLong = {
+  'monday': 'Понедельник',
+  'tuesday': 'Вторник',
+  'wednesday': 'Среда',
+  'thursday': 'Четверг',
+  'friday': 'Пятница',
+  'saturday': 'Суббота',
+  'sunday': 'Воскресенье'
+};
+
 const timeMap = [
   {
     "week_day": "sunday",
@@ -50,16 +64,53 @@ const timeMap = [
     "close_time": "18:00"
   }
 ]
-export const StepTwo = ({ form }) => {
-  return (
-    <div className="flex gap-6">
-      <div className="flex flex-col gap-4 w-[342px] shrink-0">
 
+export const StepTwo = ({ form }) => {
+  const [showStartCalendar, setShowStartCalendar] = useState(false);
+  const [showEndCalendar, setShowEndCalendar] = useState(false);
+  const [editingTime, setEditingTime] = useState<{ day: string; type: 'open' | 'close' } | null>(null);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+
+  const handleTimeChange = (day: string, type: 'open' | 'close', value: string) => {
+    const newTimeMap = timeMap.map(item => {
+      if (item.week_day === day) {
+        return {
+          ...item,
+          [type === 'open' ? 'open_time' : 'close_time']: value
+        };
+      }
+      return item;
+    });
+    form.setValue("work_hours", newTimeMap);
+    setEditingTime(null);
+  };
+
+  const formatDate = (date: Date | null) => {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return null;
+    }
+    return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatDateForDisplay = (date: Date | null) => {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return null;
+    }
+    return date.toLocaleDateString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
+  return (
+    <div className="flex gap-6 ">
+      <div className="flex flex-col gap-4 w-[342px] shrink-0">
         <div className="flex flex-col gap-2 w-full">
           <Label label="Дата" />
-          <div className="flex gap-2">
+          <div className="flex gap-2 relative">
             <Button
-              label="Начало"
+              label={formatDateForDisplay(form.watch("start_date")) || "Начало"}
               preIcon={<Icon name="Calendar" className={`${form.watch("start_date") ? "text-black" : "text-[#AAAAAA]"}`} />}
               styles="w-full items-center justify-center"
               bg={
@@ -67,17 +118,33 @@ export const StepTwo = ({ form }) => {
                   ? ButtonBG.primary
                   : ButtonBG.grey
               }
-              onClick={() => {
-                form.setValue(
-                  "start_date",
-                  form.watch("start_date")
-                    ? form.watch("start_date").filter((el) => el !== "start_date")
-                    : [...form.watch("start_date"), "start_date"]
-                );
-              }}
+              onClick={() => setShowStartCalendar(true)}
             />
+            {showStartCalendar && (
+              <div className="absolute top-full left-0 z-10 mt-2">
+                <InputCalendar
+                  value={form.watch("start_date")}
+                  onChange={(date) => {
+                    if (date) {
+                      form.setValue("start_date", date);
+                      // Update work hours open time
+                      const timeString = formatDate(date);
+                      if (timeString) {
+                        const newTimeMap = timeMap.map(day => ({
+                          ...day,
+                          open_time: timeString
+                        }));
+                        form.setValue("work_hours", newTimeMap);
+                      }
+                    }
+                    setShowStartCalendar(false);
+                  }}
+                  placeholder="Выберите дату"
+                />
+              </div>
+            )}
             <Button
-              label="Конец"
+              label={formatDateForDisplay(form.watch("end_date")) || "Конец"}
               preIcon={<Icon name="Calendar" className={`${form.watch("end_date") ? "text-black" : "text-[#AAAAAA]"}`} />}
               styles="w-full items-center justify-center"
               bg={
@@ -85,17 +152,31 @@ export const StepTwo = ({ form }) => {
                   ? ButtonBG.primary
                   : ButtonBG.grey
               }
-              onClick={() => {
-                form.setValue(
-                  "end_date",
-                  form.watch("end_date")
-                    ? form
-                      .watch("end_date")
-                      .filter((el) => el !== "end_date")
-                    : [...form.watch("end_date"), "end_date"]
-                );
-              }}
+              onClick={() => setShowEndCalendar(true)}
             />
+            {showEndCalendar && (
+              <div className="absolute top-full left-0 z-10 mt-2">
+                <InputCalendar
+                  value={form.watch("end_date")}
+                  onChange={(date) => {
+                    if (date) {
+                      form.setValue("end_date", date);
+                      // Update work hours close time
+                      const timeString = formatDate(date);
+                      if (timeString) {
+                        const newTimeMap = timeMap.map(day => ({
+                          ...day,
+                          close_time: timeString
+                        }));
+                        form.setValue("work_hours", newTimeMap);
+                      }
+                    }
+                    setShowEndCalendar(false);
+                  }}
+                  placeholder="Выберите дату"
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -140,7 +221,13 @@ export const StepTwo = ({ form }) => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div
+        className="flex flex-col gap-4"
+        onClick={() => {
+          if (!showScheduleModal) setShowScheduleModal(true);
+        }}
+        style={{ cursor: 'pointer' }}
+      >
         <div className="flex flex-col gap-2 w-full">
           <Label label="График посещения" />
           <div className="flex flex-col gap-2">
@@ -152,19 +239,27 @@ export const StepTwo = ({ form }) => {
                 >
                   <div>{weekDaysMap[el.week_day.toLowerCase()] || el.week_day}</div>
                   <div className="flex gap-2 items-center">
-                    <div className="bg-[#212121] px-3 py-2 rounded-2xl">
-                      {el.open_time}
-                    </div>
+                    <div className="bg-[#212121] px-3 py-2 rounded-2xl w-[70px] text-center">{el.open_time}</div>
                     -
-                    <div className="bg-[#212121] px-3 py-2 rounded-2xl">
-                      {el.close_time}
-                    </div>
+                    <div className="bg-[#212121] px-3 py-2 rounded-2xl w-[70px] text-center">{el.close_time}</div>
                   </div>
                 </div>
               );
             })}
           </div>
         </div>
+        {showScheduleModal && (
+          <div onClick={e => e.stopPropagation()}>
+            <ScheduleModal
+              schedule={timeMap}
+              onChange={(newSchedule) => {
+                form.setValue("work_hours", newSchedule);
+              }}
+              onClose={() => setShowScheduleModal(false)}
+              weekDaysMap={weekDaysMapLong}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
