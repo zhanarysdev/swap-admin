@@ -11,11 +11,42 @@ import { Controller, UseFormReturn } from "react-hook-form";
 import useSWR from "swr";
 import { AdFormData } from "./useAdsForm";
 
-const ImageUploader = ({ value, onChange }: { value: File[], onChange: (files: File[]) => void }) => {
+const ImageUploader = ({ value, onChange }: { value: string[], onChange: (urls: string[]) => void }) => {
+  const handleImageUpload = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('https://swapp-admin-stg-414022925388.us-central1.run.app/api/v1/image/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json();
+      return data.result;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const files = Array.from(e.target.files);
-      onChange(files);
+      try {
+        const files = Array.from(e.target.files);
+        const uploadedUrls = await Promise.all(
+          files.map(file => handleImageUpload(file))
+        );
+        console.log("-------->", uploadedUrls);
+        const newUrls = uploadedUrls.slice(0, 3);
+        onChange(newUrls);
+      } catch (error) {
+        console.error('Error handling images:', error);
+      }
     }
   };
 
@@ -186,24 +217,28 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
             <Controller
               control={form.control}
               name="images"
+              defaultValue={[]}
               render={({ field }) => (
                 <ImageUploader
                   value={field.value || []}
-                  onChange={(files: File[]) => field.onChange(files)}
+                  onChange={(urls: string[]) => {
+                    field.onChange(urls);
+                  }}
                 />
               )}
             />
           </div>
           <div className="flex gap-2">
             {[...Array(3)].map((_, index) => {
-              const imageFile = form.watch("images")[index];
+              const images = form.watch("images") || [];
+              const imageUrl = images[index];
               return (
                 <div key={index} className="w-[75px] h-[75px] relative">
-                  {imageFile ? (
+                  {imageUrl ? (
                     <>
                       <button
                         onClick={() => {
-                          const newImages = form.getValues("images").filter((_, i) => i !== index) as File[];
+                          const newImages = images.filter((_, i) => i !== index);
                           form.setValue("images", newImages);
                         }}
                         className="absolute top-[4px] right-[4px] bg-black rounded-full p-1 w-[18px] h-[18px] flex items-center justify-center"
@@ -211,7 +246,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
                         <Icon name="Close" />
                       </button>
                       <img
-                        src={URL.createObjectURL(imageFile)}
+                        src={imageUrl}
                         alt="Фото"
                         className="w-full h-full object-cover rounded-xl"
                       />

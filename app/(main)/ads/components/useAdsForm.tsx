@@ -24,11 +24,7 @@ const schema = yup
     genders: yup.array().of(yup.string()).required("Выберите хотя бы один пол"),
     images: yup
       .array()
-      .of(
-        yup
-          .mixed()
-          .test("isFile", "Must be a file", (value) => value instanceof File)
-      )
+      .of(yup.string())
       .required("Загрузите хотя бы одно изображение"),
     influencer_amount: yup
       .number()
@@ -107,9 +103,7 @@ const schema = yup
   })
   .required();
 
-export type AdFormData = yup.InferType<typeof schema> & {
-  images: File[];
-};
+export type AdFormData = yup.InferType<typeof schema>;
 
 export const useAdForm = () => {
   const form = useForm<AdFormData>({
