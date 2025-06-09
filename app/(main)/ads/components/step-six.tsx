@@ -1,4 +1,29 @@
 import { Icon } from "@/components/icons";
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
+const formatReward = (reward: string | Array<{ rank_id: string; amount: number }>) => {
+  if (!reward) return '';
+  
+  if (typeof reward === 'string') {
+    return reward;
+  }
+  
+  if (Array.isArray(reward)) {
+    return reward.map(r => `${r.amount} за ${r.rank_id}`).join(', ');
+  }
+  
+  return '';
+};
+
 export const StepSix = ({ form }) => {
   return (
     <div className="flex items-center justify-center gap-4">
@@ -13,7 +38,7 @@ export const StepSix = ({ form }) => {
         </div>
         <div className="bg-black rounded-[50px] absolute bottom-0 left-0 right-0 h-[516px]">
           <div className="flex flex-col items-center justify-center gap-2 pt-[28px] text-[#818181] font-[600] leading-5" >
-            <span className="text-[#818181]">До {form.watch("end_date")}</span>
+            <span className="text-[#818181]">До {formatDate(form.watch("end_date"))}</span>
           </div>
           <div className="text-white text-center text-2xl leading-7 font-bold">{form.watch("business_name")}</div>
           <div className="flex items-center justify-center gap-2 mt-4">
@@ -22,12 +47,11 @@ export const StepSix = ({ form }) => {
             </div>
           </div>
 
-
           <div className="bg-[#BEFF1B] rounded-[16px] w-[343px] mx-auto p-4 flex gap-2">
             <Icon name="Sa" />
             <div className="flex flex-col  text-[#212121]">
               <div className="font-bold text-lg leading-6">Вы получите:</div>
-              <div>{form.watch("reward")}</div>
+              <div>{formatReward(form.watch("reward"))}</div>
             </div>
           </div>
 
@@ -38,12 +62,10 @@ export const StepSix = ({ form }) => {
                 Задание
               </div>
               <div className="py-[6px] px-3 rounded-[16px] border text-[11px] font-normal">
-                <div>Выполнить до {form.watch("end_date")}</div>
+                <div>Выполнить до {formatDate(form.watch("end_date"))}</div>
               </div>
             </div>
           </div>
-
-
         </div>
       </div>
     </div>

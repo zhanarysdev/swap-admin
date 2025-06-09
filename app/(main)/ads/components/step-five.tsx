@@ -12,7 +12,6 @@ export const StepFive = ({ form }) => {
 
   const clothes = useSWR({ url: "clothes/list", data: { search: "", "sort_by": "name", "sort_dir": "asc" } }, post)
   if (clothes.isLoading) return <Spinner />
-  console.log(clothes.data)
 
 
   return (

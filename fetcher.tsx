@@ -99,7 +99,7 @@ export const post = async ({ url, data, custom = false }) => {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        SuperToken: token,
+        BusToken: token,
       },
       body: JSON.stringify(data),
     }

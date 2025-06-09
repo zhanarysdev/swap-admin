@@ -4,7 +4,7 @@ import { Header } from "@/components/header/header";
 import { Modal } from "@/components/modal/modal";
 import Table from "@/components/temp/table";
 import { TableContext } from "@/components/temp/table-provider";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { StepOne } from "./components/step-one";
 import { AdFormData, useAdForm } from "./components/useAdsForm";
@@ -15,7 +15,7 @@ import { StepFive } from "./components/step-five";
 import { StepSix } from "./components/step-six";
 import { StepSeven } from "./components/step-seven";
 import useSWR from "swr";
-import { fetcher } from "@/fetcher";
+import { fetcher, post } from "@/fetcher";
 
 interface WorkHours {
   open: string;
@@ -121,13 +121,15 @@ const isStepValid = (step: number, form: any) => {
         errors: errors,
       });
 
-      // Check if reward_by_rank is valid
-      const hasValidRewards =
-        values.reward_by_rank &&
-        Array.isArray(values.reward_by_rank) &&
-        values.reward_by_rank.length > 0 &&
-        values.reward_by_rank.every(
-          (reward) => reward.rank_id && reward.amount > 0
+      // Check if reward_by_rank is valid - can be either string or array of reward objects
+      console.log(values.reward_by_rank);
+      const hasValidRewards = 
+        values.reward_by_rank && (
+            Array.isArray(values.reward_by_rank) &&
+            values.reward_by_rank.length > 0 &&
+            values.reward_by_rank.every(
+              (reward) => reward.rank_id && reward.amount 
+            )
         );
 
       return hasValidRewards;
@@ -147,6 +149,7 @@ export default function AdsPage() {
   const { setContext } = useContext(TableContext);
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   // Add form values watcher
   const formValues = form.watch();
@@ -155,7 +158,6 @@ export default function AdsPage() {
     { url: `business/v1/task/list?page=1`, custom: true },
     fetcher
   );
-  console.log(data);
 
   useEffect(() => {
     setContext((prev) => ({
@@ -167,10 +169,40 @@ export default function AdsPage() {
     }));
   }, []);
 
-  const onSubmit = (data: AdFormData) => {
-    console.log(data);
+  const onSubmit = async (data: AdFormData) => {
+    console.log('data', data);
+    const response = await post({
+      url: "business/v1/task/create", 
+      custom: true, 
+      data: {
+        method: "POST",
+        body: JSON.stringify({
+          about: data.about,
+          ad_format: data.ad_format,
+          branch_ids: data.branch_ids,
+          businessID: data.businessID,
+          category_ids: data.category_ids,
+          clothing_type_id: data.clothing_type_id,
+          content_type_id: data.content_type_id,
+          end_date: data.end_date,
+          genders: data.genders,
+          images: data.images,
+          influencer_amount: Number(data.influencer_amount),
+          is_bad_words_allowed: data.is_bad_words_allowed,
+          is_custom_text: data.is_custom_text,
+          prepared_text: data.prepared_text,
+          publication_type: data.publication_type,
+          reward_by_rank: data.reward_by_rank,
+          session_duration_sec: Number(data.session_duration_sec),
+          start_date: data.start_date,
+          tag_type: data.tag_type,
+          visit_at_same_time_count: Number(data.visit_at_same_time_count),
+          work_hours_by_week_day: data.work_hours_by_week_day
+        })
+      }
+    });
+    console.log('response', response);
   };
-  console.log(formValues);
 
   return (
     <div>
@@ -186,8 +218,9 @@ export default function AdsPage() {
                 {step === 3 && <StepThree form={form} />}
                 {step === 4 && <StepFour form={form} />}
                 {step === 5 && <StepFive form={form} />}
-                {step === 6 && <StepSix form={form} />}
-                {step === 7 && <StepSeven form={form} />}
+                {/* {step === 6 && <StepSix form={form} />} */}
+                {/* {step === 7 && <StepSeven form={form} />} */}
+                <button type="submit" ref={submitButtonRef} style={{ display: 'none' }} />
               </form>
               <div className="flex flex-col gap-4 mt-8">
                 <div className="flex gap-2">
@@ -205,7 +238,14 @@ export default function AdsPage() {
                     styles="w-full justify-center font-bold"
                     label={"Далее"}
                     onClick={() => {
-                      setStep(step + 1);
+                      if (step === 5) {
+                        const values = form.getValues();
+                        if (isStepValid(step, form)) {
+                          onSubmit(values);
+                        }
+                      } else {
+                        setStep(step + 1);
+                      }
                     }}
                     disabled={!isStepValid(step, form)}
                   />
