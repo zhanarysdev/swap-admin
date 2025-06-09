@@ -40,11 +40,11 @@ export const StepFour = ({ form }) => {
     if (existingRewardIndex >= 0) {
       // Update existing reward
       const newRewards = [...currentRewards];
-      newRewards[existingRewardIndex] = { rank_id: rankId, amount: Number(value) };
+      newRewards[existingRewardIndex] = { rank_id: rankId, amount: (value) };
       form.setValue("reward_by_rank", newRewards);
     } else {
       // Add new reward
-      form.setValue("reward_by_rank", [...currentRewards, { rank_id: rankId, amount: Number(value) }]);
+      form.setValue("reward_by_rank", [...currentRewards, { rank_id: rankId, amount: (value) }]);
     }
   };
 
