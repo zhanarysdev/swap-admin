@@ -33,8 +33,8 @@ const stepLabel = {
   4: "Вознаграждение",
   5: "Условия",
   6: "Предпросмотр",
-  7: "Формирование счета"
-}
+  7: "Формирование счета",
+};
 
 const isStepValid = (step: number, form: any) => {
   const values = form.getValues();
@@ -50,7 +50,7 @@ const isStepValid = (step: number, form: any) => {
         values.branch_ids?.length > 0 &&
         values.images?.length > 0;
 
-      console.log('Step 1 Validation:', {
+      console.log("Step 1 Validation:", {
         influencer_amount: values.influencer_amount > 0,
         category_ids: values.category_ids?.length > 0,
         genders: values.genders?.length > 0,
@@ -61,73 +61,82 @@ const isStepValid = (step: number, form: any) => {
           category_ids: values.category_ids,
           genders: values.genders,
           branch_ids: values.branch_ids,
-          images: values.images
-        }
+          images: values.images,
+        },
       });
 
       return stepOneValid;
     case 2:
       // Debug step two validation
-      console.log('Step 2 Validation:', {
+      console.log("Step 2 Validation:", {
         start_date: values.start_date,
         end_date: values.end_date,
         work_hours_by_week_day: values.work_hours_by_week_day,
         session_duration_sec: values.session_duration_sec,
         visit_at_same_time_count: values.visit_at_same_time_count,
-        errors: errors
+        errors: errors,
       });
 
       // Check if all required fields are filled
       const hasValidDates = values.start_date && values.end_date;
       const hasValidSessionDuration = values.session_duration_sec > 0;
       const hasValidVisitCount = values.visit_at_same_time_count > 0;
-      const hasValidWorkHours = values.work_hours_by_week_day &&
-        Object.values(values.work_hours_by_week_day as WorkHoursByWeekDay).every(day =>
-          day.open && day.close
-        );
+      const hasValidWorkHours =
+        values.work_hours_by_week_day &&
+        Object.values(
+          values.work_hours_by_week_day as WorkHoursByWeekDay
+        ).every((day) => day.open && day.close);
 
-      return hasValidDates && hasValidSessionDuration && hasValidVisitCount && hasValidWorkHours;
+      return (
+        hasValidDates &&
+        hasValidSessionDuration &&
+        hasValidVisitCount &&
+        hasValidWorkHours
+      );
     case 3:
       // Debug step three validation
-      console.log('Step 3 Validation:', {
+      console.log("Step 3 Validation:", {
         publication_type: values.publication_type,
         ad_format: values.ad_format,
         tag_type: values.tag_type,
-        errors: errors
+        errors: errors,
       });
 
       // Check if all required fields are filled
-      const hasValidPublicationType = values.publication_type &&
-        ['reels', 'post', 'story'].includes(values.publication_type);
-      const hasValidAdFormat = values.ad_format &&
-        ['image', 'video', 'reels'].includes(values.ad_format);
-      const hasValidTagType = values.tag_type &&
-        ['together_with_influencer', 'separate'].includes(values.tag_type);
+      const hasValidPublicationType =
+        values.publication_type &&
+        ["reels", "post", "story"].includes(values.publication_type);
+      const hasValidAdFormat =
+        values.ad_format &&
+        ["image", "video", "reels"].includes(values.ad_format);
+      const hasValidTagType =
+        values.tag_type &&
+        ["together_with_influencer", "separate"].includes(values.tag_type);
 
-      return hasValidPublicationType &&
-        hasValidAdFormat &&
-        hasValidTagType;
+      return hasValidPublicationType && hasValidAdFormat && hasValidTagType;
     case 4:
       // Debug step four validation
-      console.log('Step 4 Validation:', {
+      console.log("Step 4 Validation:", {
         reward_by_rank: values.reward_by_rank,
-        errors: errors
+        errors: errors,
       });
 
       // Check if reward_by_rank is valid
-      const hasValidRewards = values.reward_by_rank &&
+      const hasValidRewards =
+        values.reward_by_rank &&
         Array.isArray(values.reward_by_rank) &&
         values.reward_by_rank.length > 0 &&
-        values.reward_by_rank.every(reward =>
-          reward.rank_id &&
-          reward.amount > 0
+        values.reward_by_rank.every(
+          (reward) => reward.rank_id && reward.amount > 0
         );
 
       return hasValidRewards;
     case 5:
-      return !errors.is_bad_words_allowed &&
+      return (
+        !errors.is_bad_words_allowed &&
         !errors.is_custom_text &&
-        (!values.is_custom_text || !errors.prepared_text);
+        (!values.is_custom_text || !errors.prepared_text)
+      );
     default:
       return true;
   }
@@ -203,7 +212,6 @@ export default function AdsPage() {
                 </div>
                 <div className="flex justify-center items-center">{step}/7</div>
               </div>
-
             </div>
           </Modal>,
           document.getElementById("page-wrapper")
