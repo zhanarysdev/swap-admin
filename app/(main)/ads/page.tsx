@@ -175,22 +175,20 @@ export default function AdsPage() {
       url: "business/v1/task/create", 
       custom: true, 
       data: {
-        method: "POST",
-        body: JSON.stringify({
           about: data.about,
           ad_format: data.ad_format,
           branch_ids: data.branch_ids,
           businessID: data.businessID,
           category_ids: data.category_ids,
           clothing_type_id: data.clothing_type_id,
-          content_type_id: data.content_type_id,
+          content_type_id: "2a436231-2969-42c8-a93a-d57b2d703c42",
           end_date: data.end_date,
           genders: data.genders,
           images: data.images,
           influencer_amount: Number(data.influencer_amount),
           is_bad_words_allowed: data.is_bad_words_allowed,
           is_custom_text: data.is_custom_text,
-          prepared_text: data.prepared_text,
+          prepared_text: data.is_custom_text ? data.prepared_text : "",
           publication_type: data.publication_type,
           reward_by_rank: data.reward_by_rank,
           session_duration_sec: Number(data.session_duration_sec),
@@ -198,7 +196,6 @@ export default function AdsPage() {
           tag_type: data.tag_type,
           visit_at_same_time_count: Number(data.visit_at_same_time_count),
           work_hours_by_week_day: data.work_hours_by_week_day
-        })
       }
     });
     console.log('response', response);

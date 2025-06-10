@@ -3,6 +3,7 @@ import { Icon } from "@/components/icons";
 import { Label } from "@/components/input/label";
 import { Text } from "@/components/input/text";
 import { Select } from "@/components/select/select";
+import { MultiSelect } from "@/components/select/multi-select";
 import { Spinner } from "@/components/spinner/spinner";
 import useProfile from "@/components/useProfile";
 import { post } from "@/fetcher";
@@ -124,9 +125,8 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
             control={form.control}
             name="category_ids"
             render={({ field }) => (
-              <Select
-                placeholder="Категория"
-                data={String(field.value)}
+              <MultiSelect
+                data={field.value}
                 options={data.result.map((el) => ({
                   label: el.name,
                   value: el.id,
@@ -179,9 +179,8 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
             control={form.control}
             name="branch_ids"
             render={({ field }) => (
-              <Select
-                data={String(field.value)}
-                placeholder="Филиалы"
+              <MultiSelect
+                data={field.value}
                 options={profile?.branches.map((el) => ({
                   label: el.address,
                   value: el.id,
