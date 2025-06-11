@@ -144,6 +144,49 @@ const isStepValid = (step: number, form: any) => {
   }
 };
 
+const labels = [
+  {
+    key: "id",
+    title: "ID",
+  },
+  {
+    key: "totalInfluencers",
+    title: "Участников",
+  },
+  {
+    key: "budget",
+    title: "Бюджет"
+  },
+  {
+    key: "deadline",
+    title: "Срок",
+  },
+  {
+    key:"type",
+    title: "Тип",
+    rounded: true
+  },
+  {
+    key: "format",
+    title: "Формат",
+    rounded: true
+  },
+  {
+    key: "status",
+    title: "Статус",
+    status: true
+  }
+]
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).replace(/\./g, '.');
+};
+
 export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
@@ -160,17 +203,26 @@ export default function AdsPage() {
   );
 
   useEffect(() => {
+    if(!data?.items) return;
     setContext((prev) => ({
       ...prev,
+      data: data.items.map((el) => ({
+        ...el, 
+        budget: `${el.spentBudget}/${el.totalBudget}`, 
+        deadline: `${formatDate(el.startDate)} - ${formatDate(el.endDate)}`
+      })),
+      number: true,
+      labels: labels,
       control: {
         label: "Создать объявление",
         action: () => setIsOpen(true),
       },
     }));
-  }, []);
+  }, [data]);
+  console.log(data)
+
 
   const onSubmit = async (data: AdFormData) => {
-    console.log('data', data);
     const response = await post({
       url: "business/v1/task/create", 
       custom: true, 

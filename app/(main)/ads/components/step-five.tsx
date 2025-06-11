@@ -74,10 +74,10 @@ export const StepFive = ({ form }) => {
               }}
             />
           </div>
-          {form.watch("custom_text") && (
+          {form.watch("prepared_text") && (
             <Controller
               control={form.control}
-              name="custom_text"
+              name="prepared_text"
               render={({ field }) => (
                 <Text
                   value={field.value}

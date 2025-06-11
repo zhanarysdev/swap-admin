@@ -6,7 +6,7 @@ import { Select } from "@/components/select/select";
 import { MultiSelect } from "@/components/select/multi-select";
 import { Spinner } from "@/components/spinner/spinner";
 import useProfile from "@/components/useProfile";
-import { post } from "@/fetcher";
+import { fetcher, post } from "@/fetcher";
 import { useState } from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
 import useSWR from "swr";
@@ -83,16 +83,11 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
 
   const { data, isLoading } = useSWR(
     {
-      url: "v1/business/category/list/all",
-      data: {
-        search: "",
-        sort_by: "name",
-        sort_dir: "asc",
-      },
-      custom: true,
+      url: "categories",
     },
-    post
+    fetcher
   );
+  console.log(data)
 
   if (isLoading || isProfileLoading) return <Spinner />;
 
