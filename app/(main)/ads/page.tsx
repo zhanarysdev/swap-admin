@@ -123,13 +123,12 @@ const isStepValid = (step: number, form: any) => {
 
       // Check if reward_by_rank is valid - can be either string or array of reward objects
       console.log(values.reward_by_rank);
-      const hasValidRewards = 
-        values.reward_by_rank && (
-            Array.isArray(values.reward_by_rank) &&
-            values.reward_by_rank.length > 0 &&
-            values.reward_by_rank.every(
-              (reward) => reward.rank_id && reward.amount 
-            )
+      const hasValidRewards =
+        values.reward_by_rank &&
+        Array.isArray(values.reward_by_rank) &&
+        values.reward_by_rank.length > 0 &&
+        values.reward_by_rank.every(
+          (reward) => reward.rank_id && reward.amount
         );
 
       return hasValidRewards;
@@ -155,36 +154,38 @@ const labels = [
   },
   {
     key: "budget",
-    title: "Бюджет"
+    title: "Бюджет",
   },
   {
     key: "deadline",
     title: "Срок",
   },
   {
-    key:"type",
+    key: "type",
     title: "Тип",
-    rounded: true
+    rounded: true,
   },
   {
     key: "format",
     title: "Формат",
-    rounded: true
+    rounded: true,
   },
   {
     key: "status",
     title: "Статус",
-    status: true
-  }
-]
+    status: true,
+  },
+];
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('ru-RU', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  }).replace(/\./g, '.');
+  return date
+    .toLocaleDateString("ru-RU", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
+    .replace(/\./g, ".");
 };
 
 export default function AdsPage() {
@@ -194,23 +195,21 @@ export default function AdsPage() {
   const [step, setStep] = useState(1);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Add form values watcher
-  const formValues = form.watch();
-
   const { data, isLoading } = useSWR(
     { url: `business/v1/task/list?page=1`, custom: true },
     fetcher
   );
 
   useEffect(() => {
-    if(!data?.items) return;
+    if (!data?.items) return;
     setContext((prev) => ({
       ...prev,
       data: data.items.map((el) => ({
-        ...el, 
-        budget: `${el.spentBudget}/${el.totalBudget}`, 
-        deadline: `${formatDate(el.startDate)} - ${formatDate(el.endDate)}`
+        ...el,
+        budget: `${el.spentBudget}/${el.totalBudget}`,
+        deadline: `${formatDate(el.startDate)} - ${formatDate(el.endDate)}`,
       })),
+      goTo: "/ads",
       number: true,
       labels: labels,
       control: {
@@ -219,38 +218,36 @@ export default function AdsPage() {
       },
     }));
   }, [data]);
-  console.log(data)
-
 
   const onSubmit = async (data: AdFormData) => {
     const response = await post({
-      url: "business/v1/task/create", 
-      custom: true, 
+      url: "business/v1/task/create",
+      custom: true,
       data: {
-          about: data.about,
-          ad_format: data.ad_format,
-          branch_ids: data.branch_ids,
-          businessID: data.businessID,
-          category_ids: data.category_ids,
-          clothing_type_id: data.clothing_type_id,
-          content_type_id: "2a436231-2969-42c8-a93a-d57b2d703c42",
-          end_date: data.end_date,
-          genders: data.genders,
-          images: data.images,
-          influencer_amount: Number(data.influencer_amount),
-          is_bad_words_allowed: data.is_bad_words_allowed,
-          is_custom_text: data.is_custom_text,
-          prepared_text: data.is_custom_text ? data.prepared_text : "",
-          publication_type: data.publication_type,
-          reward_by_rank: data.reward_by_rank,
-          session_duration_sec: Number(data.session_duration_sec),
-          start_date: data.start_date,
-          tag_type: data.tag_type,
-          visit_at_same_time_count: Number(data.visit_at_same_time_count),
-          work_hours_by_week_day: data.work_hours_by_week_day
-      }
+        about: data.about,
+        ad_format: data.ad_format,
+        branch_ids: data.branch_ids,
+        businessID: data.businessID,
+        category_ids: data.category_ids,
+        clothing_type_id: data.clothing_type_id,
+        content_type_id: "2a436231-2969-42c8-a93a-d57b2d703c42",
+        end_date: data.end_date,
+        genders: data.genders,
+        images: data.images,
+        influencer_amount: Number(data.influencer_amount),
+        is_bad_words_allowed: data.is_bad_words_allowed,
+        is_custom_text: data.is_custom_text,
+        prepared_text: data.is_custom_text ? data.prepared_text : "",
+        publication_type: data.publication_type,
+        reward_by_rank: data.reward_by_rank,
+        session_duration_sec: Number(data.session_duration_sec),
+        start_date: data.start_date,
+        tag_type: data.tag_type,
+        visit_at_same_time_count: Number(data.visit_at_same_time_count),
+        work_hours_by_week_day: data.work_hours_by_week_day,
+      },
     });
-    console.log('response', response);
+    console.log("response", response);
   };
 
   return (
@@ -269,7 +266,11 @@ export default function AdsPage() {
                 {step === 5 && <StepFive form={form} />}
                 {/* {step === 6 && <StepSix form={form} />} */}
                 {/* {step === 7 && <StepSeven form={form} />} */}
-                <button type="submit" ref={submitButtonRef} style={{ display: 'none' }} />
+                <button
+                  type="submit"
+                  ref={submitButtonRef}
+                  style={{ display: "none" }}
+                />
               </form>
               <div className="flex flex-col gap-4 mt-8">
                 <div className="flex gap-2">
