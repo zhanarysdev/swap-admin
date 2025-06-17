@@ -7,7 +7,7 @@ import { Select } from "@/components/select/select";
 import { useState } from "react";
 import { Controller } from "react-hook-form";
 
-const weekDaysMap: { [key: string]: string } = {
+export const weekDaysMap: { [key: string]: string } = {
   'monday': 'Пн',
   'tuesday': 'Вт',
   'wednesday': 'Ср',
@@ -17,7 +17,7 @@ const weekDaysMap: { [key: string]: string } = {
   'sunday': 'Вс'
 };
 
-const weekDaysMapLong = {
+export const weekDaysMapLong = {
   'monday': 'Понедельник',
   'tuesday': 'Вторник',
   'wednesday': 'Среда',
@@ -65,12 +65,12 @@ const timeMap = [
   }
 ]
 
-interface WorkHours {
+export interface WorkHours {
   open: string;
   close: string;
 }
 
-interface WorkHoursByWeekDay {
+export interface WorkHoursByWeekDay {
   [key: string]: WorkHours;
 }
 

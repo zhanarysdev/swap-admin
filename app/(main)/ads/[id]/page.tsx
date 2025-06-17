@@ -6,6 +6,8 @@ import { Spinner } from "@/components/spinner/spinner";
 import { fetcher, post } from "@/fetcher";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
+import { ScheduleModal } from "@/components/input/schedule-modal";
+import { WorkHoursByWeekDay, weekDaysMapLong } from "../components/step-two";
 
 type PageParams = {
   id: string;
@@ -13,6 +15,7 @@ type PageParams = {
 
 export default function AdsPage({ params }: { params: Promise<PageParams> }) {
   const { push } = useRouter();
+  const [showScheduleModal, setShowScheduleModal] = React.useState(false);
   const resolvedParams = React.use(params);
   const { data, isLoading } = useSWR({ url: `business/v1/task/${resolvedParams.id}`, custom: true }, fetcher)
   if (isLoading) return <Spinner />
@@ -101,11 +104,35 @@ export default function AdsPage({ params }: { params: Promise<PageParams> }) {
               </div>
             </div>
             <div className="flex flex-col gap-4 ml-auto">
-              <div className="bg-[#212121] py-3 px-4 rounded-[16px] flex items-center gap-2 cursor-pointer">
+              <div onClick={() => setShowScheduleModal(true)} className="bg-[#212121] py-3 px-4 rounded-[16px] flex items-center gap-2 cursor-pointer">
                 <Icon name="Calendar" />
                 <span>График посещения</span>
               </div>
+
+              {showScheduleModal && (
+                <div onClick={e => e.stopPropagation()}>
+                  <ScheduleModal
+                    schedule={taskData?.working_hours?.map((hours) => ({
+                      week_day: hours.week_day,
+                      open_time: hours.open_time,
+                      close_time: hours.close_time
+                    })) || []}
+                    onChange={(newSchedule) => {
+                      const formattedSchedule = newSchedule.reduce((acc, item) => ({
+                        ...acc,
+                        [item.week_day]: {
+                          open: item.open_time,
+                          close: item.close_time
+                        }
+                      }), {} as WorkHoursByWeekDay);
+                    }}
+                    onClose={() => setShowScheduleModal(false)}
+                    weekDaysMap={weekDaysMapLong}
+                  />
+                </div>
+              )}
             </div>
+
           </div>
           {/* Rewards Section */}
           <div className="mt-8">
