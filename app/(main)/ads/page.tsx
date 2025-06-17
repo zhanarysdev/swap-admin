@@ -192,7 +192,7 @@ export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(5);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const { data, isLoading } = useSWR(
@@ -230,7 +230,7 @@ export default function AdsPage() {
         businessID: data.businessID,
         category_ids: data.category_ids,
         clothing_type_id: data.clothing_type_id,
-        content_type_id: "2a436231-2969-42c8-a93a-d57b2d703c42",
+        content_type_id: data.content_type_id,
         end_date: data.end_date,
         genders: data.genders,
         images: data.images,

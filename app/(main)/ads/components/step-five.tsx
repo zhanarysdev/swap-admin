@@ -11,7 +11,9 @@ import { Controller } from "react-hook-form";
 export const StepFive = ({ form }) => {
 
   const clothes = useSWR({ url: "clothes/list", data: { search: "", "sort_by": "name", "sort_dir": "asc" } }, post)
-  if (clothes.isLoading) return <Spinner />
+  const content = useSWR({ url: "content/list", data: { search: "", "sort_by": "name", "sort_dir": "asc" } }, post)
+  if (clothes.isLoading || content.isLoading) return <Spinner />
+  console.log(content.data)
 
 
   return (
@@ -126,6 +128,28 @@ export const StepFive = ({ form }) => {
                 );
               }}
             />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 w-full">
+          <Label label="Текст для рекламы" />
+          <div className="flex gap-2">
+            {
+              content.data.result.length > 0 && content.data.result.map((el) => (
+                <Button
+                  key={el.id}
+                  label={el.name}
+                  bg={
+                    form.watch("content_type_id") === el.id
+                      ? ButtonBG.primary
+                      : ButtonBG.grey
+                  }
+                  onClick={() => {
+                    form.setValue("content_type_id", el.id);
+                  }}
+                  styles="w-full items-center justify-center"
+                />
+              ))
+            }
           </div>
         </div>
       </div>
