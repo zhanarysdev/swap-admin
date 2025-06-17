@@ -18,9 +18,38 @@ export default function AdsPage({ params }: { params: Promise<PageParams> }) {
   const [showScheduleModal, setShowScheduleModal] = React.useState(false);
   const resolvedParams = React.use(params);
   const { data, isLoading } = useSWR({ url: `business/v1/task/${resolvedParams.id}`, custom: true }, fetcher)
+  const { data: ranksData } = useSWR({ url: "rank/list", data: { search: "", "sort_by": "name", "sort_dir": "asc" } }, post)
+
   if (isLoading) return <Spinner />
 
   const taskData = data?.result;
+  const ranks = ranksData?.result || [];
+
+  const getRankName = (rankId: string) => {
+    const rank = ranks.find((r: any) => r.id === rankId);
+    return rank?.name || 'Неизвестный ранг';
+  };
+
+  const getRankColor = (rankName: string) => {
+    switch (rankName) {
+      case 'bronze': return 'bg-[#FFD600]';
+      case 'silver': return 'bg-[#C0C0C0]';
+      case 'gold': return 'bg-[#FFD700]';
+      case 'platinum': return 'bg-[#E5E4E2]';
+      default: return 'bg-[#FFD600]';
+    }
+  };
+
+  const getRankLabel = (rankName: string) => {
+    switch (rankName) {
+      case 'bronze': return 'Бронза';
+      case 'silver': return 'Серебро';
+      case 'gold': return 'Золото';
+      case 'platinum': return 'Платина';
+      default: return rankName;
+    }
+  };
+
   const archive = async () => {
     const res = await post({
       url: `business/v1/task/archive/${resolvedParams.id}`,
@@ -140,14 +169,13 @@ export default function AdsPage({ params }: { params: Promise<PageParams> }) {
               Вознаграждения
             </h2>
             <div className="grid grid-cols-2 gap-4 max-w-[600px]">
-              {taskData?.rewards_by_rank.map((reward, index) => (
+              {taskData?.rewards_by_rank.map((reward) => (
                 <div key={reward.id} className="flex items-center gap-2 bg-[#212121] rounded-[12px] px-4 py-3">
-                  <span className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-[#FFD600]' :
-                    index === 1 ? 'bg-[#C0C0C0]' :
-                      index === 2 ? 'bg-[#FFD700]' :
-                        'bg-[#E5E4E2]'
-                    } inline-block`}></span>
-                  <span>{reward.reward || 'Не указано'}</span>
+                  <span className={`w-3 h-3 rounded-full ${getRankColor(getRankName(reward.rank_id))} inline-block`}></span>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{getRankLabel(getRankName(reward.rank_id))}</span>
+                    <span className="text-xs text-[#A1A1A1]">{reward.reward || 'Не указано'}</span>
+                  </div>
                   <span className="ml-auto">▼</span>
                 </div>
               ))}
