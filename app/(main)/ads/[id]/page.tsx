@@ -3,7 +3,7 @@ import React from "react";
 import { Button, ButtonBG } from "@/components/button/button";
 import { Icon } from "@/components/icons";
 import { Spinner } from "@/components/spinner/spinner";
-import { fetcher } from "@/fetcher";
+import { fetcher, post } from "@/fetcher";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 
@@ -18,6 +18,16 @@ export default function AdsPage({ params }: { params: Promise<PageParams> }) {
   if (isLoading) return <Spinner />
 
   const taskData = data?.result;
+  const archive = async () => {
+    const res = await post({
+      url: `business/v1/task/archive/${resolvedParams.id}`,
+      custom: true,
+      data: {}
+    })
+    if (res.message === "Task archived successfully") {
+      push("/ads")
+    }
+  }
 
   return (
     <div>
@@ -35,6 +45,7 @@ export default function AdsPage({ params }: { params: Promise<PageParams> }) {
             preIcon={<Icon name="Archive" />}
             bg={ButtonBG.grey}
             label={"Архивировать"}
+            onClick={archive}
           />
           <Button
             preIcon={<Icon name={"Eye"} />}
@@ -46,7 +57,7 @@ export default function AdsPage({ params }: { params: Promise<PageParams> }) {
       <div className="flex gap-8 flex-col">
         <h1 className="text-[36px] font-bold leading-[40px] mb-8">{taskData?.categories[0]?.name}</h1>
         <div className="bg-[#383838] rounded-[32px] flex flex-col gap-[32px] p-6">
-          <div className="flex gap-6">
+          <div className="flex gap-8">
             <div className="flex flex-col gap-4 max-w-[500px]">
               <h2 className="font-manrope font-semibold text-[20px] leading-[20px] tracking-[0%] mb-3">
                 Информация о бизнесе
@@ -68,7 +79,7 @@ export default function AdsPage({ params }: { params: Promise<PageParams> }) {
               <h2 className="font-manrope font-semibold text-[20px] leading-[20px] tracking-[0%] mb-3">
                 Информация об объявлении
               </h2>
-              <div className="grid grid-cols-[120px_1fr] gap-y-3 text-[15px]">
+              <div className="grid grid-cols-[160px_1fr] gap-y-3 text-[15px]">
                 <span className="text-[#A1A1A1]">Создано:</span>
                 <span>{new Date(taskData?.created_at || '').toLocaleDateString()}</span>
                 <span className="text-[#A1A1A1]">Бюджет:</span>
@@ -89,7 +100,7 @@ export default function AdsPage({ params }: { params: Promise<PageParams> }) {
                 <span>{taskData?.tag_type}</span>
               </div>
             </div>
-            <div className="flex flex-col gap-4 ">
+            <div className="flex flex-col gap-4 ml-auto">
               <div className="bg-[#212121] py-3 px-4 rounded-[16px] flex items-center gap-2 cursor-pointer">
                 <Icon name="Calendar" />
                 <span>График посещения</span>
