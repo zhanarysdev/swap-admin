@@ -144,7 +144,8 @@ const isStepValid = (step: number, form: any) => {
       return (
         !errors.is_bad_words_allowed &&
         !errors.is_custom_text &&
-        (!values.is_custom_text || !errors.prepared_text)
+        (!values.is_custom_text || !errors.prepared_text) &&
+        values.content_ids?.length > 0
       );
     default:
       return true;
@@ -239,7 +240,7 @@ export default function AdsPage() {
         businessID: data.businessID,
         category_ids: data.category_ids,
         clothing_type_id: data.clothing_type_id,
-        content_type_id: data.content_type_id,
+        content_ids: data.content_ids,
         end_date: data.end_date,
         genders: data.genders,
         images: data.images,

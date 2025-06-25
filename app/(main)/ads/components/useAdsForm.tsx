@@ -19,7 +19,11 @@ const schema = yup
       .of(yup.string())
       .required("Выберите хотя бы одну категорию"),
     clothing_type_id: yup.string().required("Тип одежды обязателен"),
-    content_type_id: yup.string().required("Тип контента обязателен"),
+    content_ids: yup
+      .array()
+      .of(yup.string())
+      .min(1, "Выберите хотя бы один тип контента")
+      .required("Тип контента обязателен"),
     end_date: yup.string().required("Дата окончания обязательна"),
     genders: yup.array().of(yup.string()).required("Выберите хотя бы один пол"),
     images: yup
@@ -129,7 +133,7 @@ export const useAdForm = () => {
       businessID: "",
       category_ids: [],
       clothing_type_id: "",
-      content_type_id: "",
+      content_ids: [],
       end_date: "",
       genders: [],
       images: [],

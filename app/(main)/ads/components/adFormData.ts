@@ -27,5 +27,5 @@ export interface AdFormData {
   custom_text: string;
   prepared_text: boolean;
   clothing_type_id: number;
-  content_type_id: number;
+  content_ids: string[];
 }

@@ -131,7 +131,7 @@ export const StepFive = ({ form }) => {
           </div>
         </div>
         <div className="flex flex-col gap-2 w-full">
-          <Label label="Текст для рекламы" />
+          <Label label="Тип контента" />
           <div className="flex gap-2">
             {
               content.data.result.length > 0 && content.data.result.map((el) => (
@@ -139,12 +139,16 @@ export const StepFive = ({ form }) => {
                   key={el.id}
                   label={el.name}
                   bg={
-                    form.watch("content_type_id") === el.id
+                    form.watch("content_ids")?.includes(el.id)
                       ? ButtonBG.primary
                       : ButtonBG.grey
                   }
                   onClick={() => {
-                    form.setValue("content_type_id", el.id);
+                    const currentContentIds = form.watch("content_ids") || [];
+                    const newContentIds = currentContentIds.includes(el.id)
+                      ? currentContentIds.filter(id => id !== el.id)
+                      : [...currentContentIds, el.id];
+                    form.setValue("content_ids", newContentIds);
                   }}
                   styles="w-full items-center justify-center"
                 />
