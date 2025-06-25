@@ -73,30 +73,44 @@ const schema = yup
         monday: yup.object({
           open: yup.string().required("Время открытия обязательно"),
           close: yup.string().required("Время закрытия обязательно"),
+        }).test('times-not-equal', 'Время открытия и закрытия не могут быть одинаковыми', function (value) {
+          return value.open !== value.close;
         }),
         tuesday: yup.object({
           open: yup.string().required("Время открытия обязательно"),
           close: yup.string().required("Время закрытия обязательно"),
+        }).test('times-not-equal', 'Время открытия и закрытия не могут быть одинаковыми', function (value) {
+          return value.open !== value.close;
         }),
         wednesday: yup.object({
           open: yup.string().required("Время открытия обязательно"),
           close: yup.string().required("Время закрытия обязательно"),
+        }).test('times-not-equal', 'Время открытия и закрытия не могут быть одинаковыми', function (value) {
+          return value.open !== value.close;
         }),
         thursday: yup.object({
           open: yup.string().required("Время открытия обязательно"),
           close: yup.string().required("Время закрытия обязательно"),
+        }).test('times-not-equal', 'Время открытия и закрытия не могут быть одинаковыми', function (value) {
+          return value.open !== value.close;
         }),
         friday: yup.object({
           open: yup.string().required("Время открытия обязательно"),
           close: yup.string().required("Время закрытия обязательно"),
+        }).test('times-not-equal', 'Время открытия и закрытия не могут быть одинаковыми', function (value) {
+          return value.open !== value.close;
         }),
         saturday: yup.object({
           open: yup.string().required("Время открытия обязательно"),
           close: yup.string().required("Время закрытия обязательно"),
+        }).test('times-not-equal', 'Время открытия и закрытия не могут быть одинаковыми', function (value) {
+          return value.open !== value.close;
         }),
         sunday: yup.object({
           open: yup.string().required("Время открытия обязательно"),
           close: yup.string().required("Время закрытия обязательно"),
+        }).test('times-not-equal', 'Время открытия и закрытия не могут быть одинаковыми', function (value) {
+          return value.open !== value.close;
         }),
       })
       .required("Рабочие часы обязательны"),

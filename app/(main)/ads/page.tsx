@@ -87,11 +87,19 @@ const isStepValid = (step: number, form: any) => {
           values.work_hours_by_week_day as WorkHoursByWeekDay
         ).every((day) => day.open && day.close);
 
+      // Check for time equality errors
+      const hasTimeEqualityErrors =
+        values.work_hours_by_week_day &&
+        Object.values(values.work_hours_by_week_day as WorkHoursByWeekDay).some(
+          (day) => day.open === day.close
+        );
+
       return (
         hasValidDates &&
         hasValidSessionDuration &&
         hasValidVisitCount &&
-        hasValidWorkHours
+        hasValidWorkHours &&
+        !hasTimeEqualityErrors
       );
     case 3:
       // Debug step three validation
@@ -192,7 +200,7 @@ export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(5);
+  const [step, setStep] = useState(1);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const { data, isLoading } = useSWR(
@@ -208,6 +216,7 @@ export default function AdsPage() {
         ...el,
         budget: `${el.spentBudget}/${el.totalBudget}`,
         deadline: `${formatDate(el.startDate)} - ${formatDate(el.endDate)}`,
+        status: el.isArchived ? "В архиве" : el.status
       })),
       goTo: "/ads",
       number: true,
@@ -249,6 +258,20 @@ export default function AdsPage() {
     });
     console.log("response", response);
   };
+  const pay = async () => {
+    const res = await post({
+      url: "payment/top-up", data: {
+        "amount": 50,
+        "card_holder": "TEST CARDHOLDER",
+        "card_number": "4000001111111118",
+        "cvc": "123",
+        "description": "string",
+        "expiry_month": "12",
+        "expiry_year": "2030"
+      }
+    })
+    console.log("res", res)
+  }
 
   return (
     <div>
@@ -264,8 +287,8 @@ export default function AdsPage() {
                 {step === 3 && <StepThree form={form} />}
                 {step === 4 && <StepFour form={form} />}
                 {step === 5 && <StepFive form={form} />}
-                {/* {step === 6 && <StepSix form={form} />} */}
-                {/* {step === 7 && <StepSeven form={form} />} */}
+                {step === 6 && <StepSix form={form} />}
+                {step === 7 && <StepSeven form={form} />}
                 <button
                   type="submit"
                   ref={submitButtonRef}
@@ -288,14 +311,7 @@ export default function AdsPage() {
                     styles="w-full justify-center font-bold"
                     label={"Далее"}
                     onClick={() => {
-                      if (step === 5) {
-                        const values = form.getValues();
-                        if (isStepValid(step, form)) {
-                          onSubmit(values);
-                        }
-                      } else {
-                        setStep(step + 1);
-                      }
+                      setStep(step + 1);
                     }}
                     disabled={!isStepValid(step, form)}
                   />

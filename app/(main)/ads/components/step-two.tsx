@@ -245,6 +245,12 @@ export const StepTwo = ({ form }) => {
       >
         <div className="flex flex-col gap-2 w-full">
           <Label label="График посещения" />
+          {Object.entries(form.watch("work_hours_by_week_day") || {}).some(([_, hours]) => {
+            const h = hours as WorkHours;
+            return h.open === h.close;
+          }) && (
+              <div className="text-[#D93438] text-sm mb-2">Время открытия и закрытия не могут быть одинаковыми</div>
+            )}
           <div className="flex flex-col gap-2">
             {Object.entries(form.watch("work_hours_by_week_day") || {} as WorkHoursByWeekDay).map(([day, hours]) => {
               const typedHours = hours as WorkHours;

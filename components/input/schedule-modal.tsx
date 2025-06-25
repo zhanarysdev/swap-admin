@@ -64,6 +64,8 @@ export function ScheduleModal({
                   .react-time-picker__clock-button {
                     display: none;
                   }
+                    .react-time-picker__inputGroup__input--hasLeadingZero {
+                    padding: 0; margin: 0}
                 `}</style>
                 <div className="flex flex-col gap-4 overflow-y-auto">
                     <div className="text-xl font-bold text-white mb-4">График посещения</div>
@@ -85,7 +87,7 @@ export function ScheduleModal({
                                     clockIcon={null}
                                     className="w-[90px]"
                                 />
-                                <span className="text-white text-base">-</span>
+                                <span className="text-white text-base ml-2">-</span>
                                 <TimePicker
                                     onChange={val => handleTimeChange(el.week_day, 'close', val as string)}
                                     value={el.close_time}
