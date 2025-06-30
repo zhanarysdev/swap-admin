@@ -6,6 +6,7 @@ import Table from "@/components/temp/table";
 import { TableContext } from "@/components/temp/table-provider";
 import { useContext, useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { StepOne } from "./components/step-one";
 import { AdFormData, useAdForm } from "./components/useAdsForm";
 import { StepTwo } from "./components/step-two";
@@ -14,6 +15,7 @@ import { StepFour } from "./components/step-four";
 import { StepFive } from "./components/step-five";
 import { StepSix } from "./components/step-six";
 import { StepSeven } from "./components/step-seven";
+import { StepEight } from "./components/step-eight";
 import useSWR from "swr";
 import { fetcher, post } from "@/fetcher";
 
@@ -34,6 +36,7 @@ const stepLabel = {
   5: "Условия",
   6: "Предпросмотр",
   7: "Формирование счета",
+  8: "Оплата",
 };
 
 const isStepValid = (step: number, form: any) => {
@@ -136,7 +139,7 @@ const isStepValid = (step: number, form: any) => {
         Array.isArray(values.reward_by_rank) &&
         values.reward_by_rank.length > 0 &&
         values.reward_by_rank.every(
-          (reward) => reward.rank_id && reward.amount
+          (reward) => reward.rank_id && reward.reward
         );
 
       return hasValidRewards;
@@ -146,6 +149,42 @@ const isStepValid = (step: number, form: any) => {
         !errors.is_custom_text &&
         (!values.is_custom_text || !errors.prepared_text) &&
         values.content_ids?.length > 0
+      );
+    case 7:
+      // Debug step seven validation
+      console.log("Step 7 Validation:", {
+        amount: values.amount,
+        errors: errors,
+      });
+
+      // Check if amount is valid
+      const hasValidAmount = values.amount && values.amount > 0;
+
+      return hasValidAmount;
+    case 8:
+      // Debug step eight validation
+      console.log("Step 8 Validation:", {
+        card_number: values.card_number,
+        card_holder: values.card_holder,
+        cvc: values.cvc,
+        expiry_month: values.expiry_month,
+        expiry_year: values.expiry_year,
+        errors: errors,
+      });
+
+      // Check if all payment fields are filled
+      const hasValidCardNumber = values.card_number && values.card_number.length > 0;
+      const hasValidCardHolder = values.card_holder && values.card_holder.length > 0;
+      const hasValidCvc = values.cvc && values.cvc.length > 0;
+      const hasValidExpiryMonth = values.expiry_month && values.expiry_month.length > 0;
+      const hasValidExpiryYear = values.expiry_year && values.expiry_year.length > 0;
+
+      return (
+        hasValidCardNumber &&
+        hasValidCardHolder &&
+        hasValidCvc &&
+        hasValidExpiryMonth &&
+        hasValidExpiryYear
       );
     default:
       return true;
@@ -203,6 +242,7 @@ export default function AdsPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
 
   const { data, isLoading } = useSWR(
     { url: `business/v1/task/list?page=1`, custom: true },
@@ -230,48 +270,65 @@ export default function AdsPage() {
   }, [data]);
 
   const onSubmit = async (data: AdFormData) => {
-    const response = await post({
-      url: "business/v1/task/create",
-      custom: true,
-      data: {
-        about: data.about,
-        ad_format: data.ad_format,
-        branch_ids: data.branch_ids,
-        businessID: data.businessID,
-        category_ids: data.category_ids,
-        clothing_type_id: data.clothing_type_id,
-        content_ids: data.content_ids,
-        end_date: data.end_date,
-        genders: data.genders,
-        images: data.images,
-        influencer_amount: Number(data.influencer_amount),
-        is_bad_words_allowed: data.is_bad_words_allowed,
-        is_custom_text: data.is_custom_text,
-        prepared_text: data.is_custom_text ? data.prepared_text : "",
-        publication_type: data.publication_type,
-        reward_by_rank: data.reward_by_rank,
-        session_duration_sec: Number(data.session_duration_sec),
-        start_date: data.start_date,
-        tag_type: data.tag_type,
-        visit_at_same_time_count: Number(data.visit_at_same_time_count),
-        work_hours_by_week_day: data.work_hours_by_week_day,
-      },
-    });
-    console.log("response", response);
+    try {
+      const response = await post({
+        url: "business/v1/task/create",
+        custom: true,
+        data: {
+          about: data.about,
+          ad_format: data.ad_format,
+          branch_ids: data.branch_ids,
+          businessID: data.businessID,
+          category_ids: data.category_ids,
+          clothing_type_id: data.clothing_type_id,
+          content_ids: data.content_ids,
+          end_date: data.end_date,
+          genders: data.genders,
+          images: data.images,
+          influencer_amount: Number(data.influencer_amount),
+          is_bad_words_allowed: data.is_bad_words_allowed,
+          is_custom_text: data.is_custom_text,
+          prepared_text: data.is_custom_text ? data.prepared_text : "",
+          publication_type: data.publication_type,
+          reward_by_rank: data.reward_by_rank,
+          session_duration_sec: Number(data.session_duration_sec),
+          start_date: data.start_date,
+          tag_type: data.tag_type,
+          visit_at_same_time_count: Number(data.visit_at_same_time_count),
+          work_hours_by_week_day: data.work_hours_by_week_day,
+          tag_business_required: true,
+          budget: 0,
+        },
+      });
+      console.log("response", response);
+      if (response.task_id) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Form submission failed:", error);
+      return false; // Return false on error
+    }
   };
-  const pay = async () => {
+  const pay = async (formData: AdFormData) => {
     const res = await post({
-      url: "payment/top-up", data: {
-        "amount": 50,
-        "card_holder": "TEST CARDHOLDER",
-        "card_number": "4000001111111118",
-        "cvc": "123",
-        "description": "string",
-        "expiry_month": "12",
-        "expiry_year": "2030"
+      url: "payment/top-up",
+      data: {
+        "amount": Number(formData.amount),
+        "card_holder": formData.card_holder,
+        "card_number": formData.card_number,
+        "cvc": formData.cvc,
+        "expiry_month": formData.expiry_month,
+        "expiry_year": formData.expiry_year
       }
     })
     console.log("res", res)
+    if (res.statusCode === 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   return (
@@ -290,6 +347,7 @@ export default function AdsPage() {
                 {step === 5 && <StepFive form={form} />}
                 {step === 6 && <StepSix form={form} />}
                 {step === 7 && <StepSeven form={form} />}
+                {step === 8 && <StepEight form={form} />}
                 <button
                   type="submit"
                   ref={submitButtonRef}
@@ -310,14 +368,32 @@ export default function AdsPage() {
                   )}
                   <Button
                     styles="w-full justify-center font-bold"
-                    label={"Далее"}
-                    onClick={() => {
-                      setStep(step + 1);
+                    label={step === 8 ? "Оплатить и создать" : "Далее"}
+                    onClick={async () => {
+                      if (step === 8) {
+                        try {
+                          const formData = form.getValues();
+                          const paymentResult = await pay(formData);
+                          console.log("paymentResult", paymentResult)
+                          if (paymentResult) {
+                            const submitResult = await onSubmit(formData);
+                            console.log("submitResult", submitResult)
+                            if (submitResult) {
+                              setIsOpen(false);
+                              router.push("/ads");
+                            }
+                          }
+                        } catch (error) {
+                          console.error("Payment failed:", error);
+                        }
+                      } else {
+                        setStep(step + 1);
+                      }
                     }}
                     disabled={!isStepValid(step, form)}
                   />
                 </div>
-                <div className="flex justify-center items-center">{step}/7</div>
+                <div className="flex justify-center items-center">{step}/8</div>
               </div>
             </div>
           </Modal>,

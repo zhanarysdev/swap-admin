@@ -13,7 +13,7 @@ const schema = yup
       .array()
       .of(yup.string())
       .required("Выберите хотя бы один филиал"),
-    businessID: yup.string().required("ID бизнеса обязателен"),
+    businessID: yup.string(),
     category_ids: yup
       .array()
       .of(yup.string())
@@ -118,6 +118,15 @@ const schema = yup
         }),
       })
       .required("Рабочие часы обязательны"),
+    amount: yup
+      .number()
+      .min(1, "Сумма должна быть больше 0")
+      .required("Сумма пополнения обязательна"),
+    card_number: yup.string().required("Номер карты обязателен"),
+    card_holder: yup.string().required("Владелец карты обязателен"),
+    cvc: yup.string().required("CVC обязателен"),
+    expiry_month: yup.string().required("Месяц обязателен"),
+    expiry_year: yup.string().required("Год обязателен"),
   })
   .required();
 
@@ -156,6 +165,12 @@ export const useAdForm = () => {
         saturday: { open: "09:00", close: "18:00" },
         sunday: { open: "09:00", close: "18:00" },
       },
+      amount: 0,
+      card_number: "",
+      card_holder: "",
+      cvc: "",
+      expiry_month: "",
+      expiry_year: "",
     },
   });
 

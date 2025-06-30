@@ -40,18 +40,18 @@ export const StepFour = ({ form }) => {
     if (existingRewardIndex >= 0) {
       // Update existing reward
       const newRewards = [...currentRewards];
-      newRewards[existingRewardIndex] = { rank_id: rankId, amount: (value) };
+      newRewards[existingRewardIndex] = { rank_id: rankId, reward: (value) };
       form.setValue("reward_by_rank", newRewards);
     } else {
       // Add new reward
-      form.setValue("reward_by_rank", [...currentRewards, { rank_id: rankId, amount: (value) }]);
+      form.setValue("reward_by_rank", [...currentRewards, { rank_id: rankId, reward: (value) }]);
     }
   };
 
   const getRewardValue = (rankId) => {
     const rewards = form.watch("reward_by_rank") || [];
     const reward = rewards.find(r => r.rank_id === rankId);
-    return reward ? reward.amount : "";
+    return reward ? reward.reward : "";
   };
 
   return (

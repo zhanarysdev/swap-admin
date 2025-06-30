@@ -30,7 +30,14 @@ export const StepSeven = ({ form }) => {
 
       <div className="flex flex-col gap-2 w-full">
         <Label label="Введите сумму пополнения" />
-        <Input value={form.watch("influencers")} />
+        <Input
+          {...form.register("amount", {
+            valueAsNumber: true,
+            onChange: (e) => form.setValue("amount", Number(e.target.value))
+          })}
+          type="number"
+          placeholder="Введите сумму"
+        />
       </div>
     </div>
   );
