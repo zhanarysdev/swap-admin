@@ -87,7 +87,6 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
     },
     fetcher
   );
-  console.log(data)
 
   if (isLoading || isProfileLoading) return <Spinner />;
 

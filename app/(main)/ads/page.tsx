@@ -84,25 +84,14 @@ const isStepValid = (step: number, form: any) => {
       const hasValidDates = values.start_date && values.end_date;
       const hasValidSessionDuration = values.session_duration_sec > 0;
       const hasValidVisitCount = values.visit_at_same_time_count > 0;
-      const hasValidWorkHours =
-        values.work_hours_by_week_day &&
-        Object.values(
-          values.work_hours_by_week_day as WorkHoursByWeekDay
-        ).every((day) => day.open && day.close);
 
-      // Check for time equality errors
-      const hasTimeEqualityErrors =
-        values.work_hours_by_week_day &&
-        Object.values(values.work_hours_by_week_day as WorkHoursByWeekDay).some(
-          (day) => day.open === day.close
-        );
+
+
 
       return (
         hasValidDates &&
         hasValidSessionDuration &&
-        hasValidVisitCount &&
-        hasValidWorkHours &&
-        !hasTimeEqualityErrors
+        hasValidVisitCount
       );
     case 3:
       // Debug step three validation
@@ -240,7 +229,7 @@ export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(4);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
 

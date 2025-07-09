@@ -43,9 +43,8 @@ export const Select = ({
       <div className="relative w-full">
         <div
           onClick={() => setOpen((old) => !old)}
-          className={`styled-select bg-[#333333] w-full rounded-2xl py-[15px] px-[25px] text-base leading-5 font-medium ${
-            !disabled && isOpen ? "rounded-bl-none rounded-br-none" : ""
-          }`}
+          className={`styled-select bg-[#333333] w-full rounded-2xl py-[15px] px-[25px] text-base leading-5 font-medium ${!disabled && isOpen ? "rounded-bl-none rounded-br-none" : ""
+            }`}
         >
           <option
             value={value}

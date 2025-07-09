@@ -24,7 +24,10 @@ export const StepFour = ({ form }) => {
 
   useEffect(() => {
     if (data) {
-      setRanks(data.result.map((el) => ({
+      // Sort the ranks in the desired order
+      const order = ["bronze", "silver", "gold", "platinum"];
+      const sorted = data.result.slice().sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+      setRanks(sorted.map((el) => ({
         id: el.id,
         label: getLabel(el.name)
       })))
