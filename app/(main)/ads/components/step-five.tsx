@@ -59,34 +59,33 @@ export const StepFive = ({ form }) => {
               }
               onClick={() => {
                 form.setValue("custom_text", "Произв. положительный отзыв");
-                form.setValue("prepared_text", false);
+                form.setValue("prepared_text", ""); // Set to empty string, not false
               }}
             />
             <Button
               label="Подготовленный текст"
               styles="w-full items-center justify-center"
               bg={
-                form.watch("prepared_text")
+                typeof form.watch("prepared_text") === "string" && form.watch("prepared_text") !== ""
                   ? ButtonBG.primary
                   : ButtonBG.grey
               }
               onClick={() => {
-                form.setValue("prepared_text", true);
+                form.setValue("prepared_text", "Введите текст"); // Set to default text
                 form.setValue("custom_text", "");
               }}
             />
           </div>
-          {form.watch("prepared_text") && (
+          {typeof form.watch("prepared_text") === "string" && form.watch("prepared_text") !== "" && (
             <Controller
               control={form.control}
               name="prepared_text"
               render={({ field }) => (
                 <Text
-                  value={field.value}
-                  count={field.value?.length || 0}
+                  value={typeof field.value === "string" && field.value !== "" ? field.value : "Введите текст"}
+                  count={typeof field.value === "string" ? field.value.length : 0}
                   maxCount={150}
                   onChange={(e) => {
-                    console.log(e.target.value)
                     field.onChange(e.target.value)
                   }}
                 />
