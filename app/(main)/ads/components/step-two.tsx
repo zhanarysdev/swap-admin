@@ -205,9 +205,9 @@ export const StepTwo = ({ form }) => {
                 data={String(field.value)}
                 placeholder="Время посещения (до)"
                 options={[
-                  { label: "2", value: "2" },
-                  { label: "4", value: "4" },
-                  { label: "8", value: "8" },
+                  { label: "2 часа", value: "2" },
+                  { label: "4 часа", value: "4" },
+                  { label: "8 часов", value: "8" },
                 ]}
                 onChange={field.onChange}
               />

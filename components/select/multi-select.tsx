@@ -77,7 +77,7 @@ export const MultiSelect = ({
                 } else {
                   setValue((old) => [...old, value]);
                   onChange([...curValue, value]);
-                  setOpen(false);
+                  // Keep dropdown open for multiple selections
                 }
               }}
             >

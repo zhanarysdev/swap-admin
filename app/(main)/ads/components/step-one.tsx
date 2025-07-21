@@ -43,8 +43,11 @@ const ImageUploader = ({ value, onChange }: { value: string[], onChange: (urls: 
           files.map(file => handleImageUpload(file))
         );
         console.log("-------->", uploadedUrls);
-        const newUrls = uploadedUrls.slice(0, 3);
-        onChange(newUrls);
+
+        // Add new images to existing ones, but limit total to 3
+        const currentImages = value || [];
+        const newImages = [...currentImages, ...uploadedUrls].slice(0, 3);
+        onChange(newImages);
       } catch (error) {
         console.error('Error handling images:', error);
       }
@@ -103,9 +106,9 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
                 data={String(field.value)}
                 placeholder="Количество инфлюэнсеров (до)"
                 options={[
-                  { label: "5", value: "5" },
-                  { label: "10", value: "10" },
-                  { label: "15", value: "15" },
+                  { label: "5 блогеров", value: "5" },
+                  { label: "10 блогеров", value: "10" },
+                  { label: "15 блогеров", value: "15" },
                 ]}
                 onChange={field.onChange}
               />

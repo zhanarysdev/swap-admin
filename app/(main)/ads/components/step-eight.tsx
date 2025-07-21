@@ -1,14 +1,41 @@
 import { Input } from "@/components/input/input";
 import { Label } from "@/components/input/label";
+import { useState } from "react";
 
 export const StepEight = ({ form }) => {
+    const [cardNumberDisplay, setCardNumberDisplay] = useState("");
+
+    const formatCardNumber = (value: string) => {
+        // Remove all non-digits
+        const digitsOnly = value.replace(/\D/g, '');
+
+        // Add spaces after every 4 digits
+        const formatted = digitsOnly.replace(/(\d{4})(?=\d)/g, '$1 ');
+
+        return formatted;
+    };
+
+    const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const input = e.target.value;
+        const formatted = formatCardNumber(input);
+
+        // Update display value
+        setCardNumberDisplay(formatted);
+
+        // Store only digits in form
+        const digitsOnly = input.replace(/\D/g, '');
+        form.setValue("card_number", digitsOnly);
+    };
+
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2 w-full">
                 <Label label="Номер карты" />
                 <Input
-                    {...form.register("card_number")}
-                    placeholder="4000001111111118"
+                    value={cardNumberDisplay}
+                    onChange={handleCardNumberChange}
+                    placeholder="4000 0000 1111 1118"
+                    maxLength={19} // 16 digits + 3 spaces
                 />
             </div>
 

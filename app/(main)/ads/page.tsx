@@ -229,7 +229,8 @@ export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(7);
+  const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
 
@@ -359,8 +360,11 @@ export default function AdsPage() {
                     styles="w-full justify-center font-bold"
                     label={step === 8 ? "Оплатить и создать" : "Далее"}
                     onClick={async () => {
+                      if (isSubmitting) return; // Prevent multiple submissions
+
                       if (step === 8) {
                         try {
+                          setIsSubmitting(true);
                           const formData = form.getValues();
                           const paymentResult = await pay(formData);
                           console.log("paymentResult", paymentResult)
@@ -374,12 +378,14 @@ export default function AdsPage() {
                           }
                         } catch (error) {
                           console.error("Payment failed:", error);
+                        } finally {
+                          setIsSubmitting(false);
                         }
                       } else {
                         setStep(step + 1);
                       }
                     }}
-                    disabled={!isStepValid(step, form)}
+                    disabled={!isStepValid(step, form) || isSubmitting}
                   />
                 </div>
                 <div className="flex justify-center items-center">{step}/8</div>
