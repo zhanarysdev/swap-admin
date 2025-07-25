@@ -39,146 +39,7 @@ const stepLabel = {
   8: "Оплата",
 };
 
-const isStepValid = (step: number, form: any) => {
-  const values = form.getValues();
-  const errors = form.formState.errors;
 
-  switch (step) {
-    case 1:
-      // Only validate fields that are shown in step one
-      const stepOneValid =
-        values.influencer_amount > 0 &&
-        values.category_ids?.length > 0 &&
-        values.genders?.length > 0 &&
-        values.branch_ids?.length > 0 &&
-        values.images?.length > 0;
-      values.about.length > 0
-
-
-      console.log("Step 1 Validation:", {
-        influencer_amount: values.influencer_amount > 0,
-        category_ids: values.category_ids?.length > 0,
-        genders: values.genders?.length > 0,
-        branch_ids: values.branch_ids?.length > 0,
-        images: values.images?.length > 0,
-        values: {
-          influencer_amount: values.influencer_amount,
-          category_ids: values.category_ids,
-          genders: values.genders,
-          branch_ids: values.branch_ids,
-          images: values.images,
-          about: values.about,
-        },
-      });
-
-      return stepOneValid;
-    case 2:
-      // Debug step two validation
-      console.log("Step 2 Validation:", {
-        start_date: values.start_date,
-        end_date: values.end_date,
-        work_hours_by_week_day: values.work_hours_by_week_day,
-        session_duration_sec: values.session_duration_sec,
-        visit_at_same_time_count: values.visit_at_same_time_count,
-        errors: errors,
-      });
-
-      // Check if all required fields are filled
-      const hasValidDates = values.start_date && values.end_date;
-      const hasValidSessionDuration = values.session_duration_sec > 0;
-      const hasValidVisitCount = values.visit_at_same_time_count > 0;
-
-
-
-
-      return (
-        hasValidDates &&
-        hasValidSessionDuration &&
-        hasValidVisitCount
-      );
-    case 3:
-      // Debug step three validation
-      console.log("Step 3 Validation:", {
-        publication_type: values.publication_type,
-        ad_format: values.ad_format,
-        tag_type: values.tag_type,
-        errors: errors,
-      });
-
-      // Check if all required fields are filled
-      const hasValidPublicationType =
-        values.publication_type &&
-        ["reels", "post", "story"].includes(values.publication_type);
-      const hasValidAdFormat =
-        values.ad_format &&
-        ["image", "video", "reels"].includes(values.ad_format);
-      const hasValidTagType =
-        values.tag_type &&
-        ["together_with_influencer", "separate"].includes(values.tag_type);
-
-      return hasValidPublicationType && hasValidAdFormat && hasValidTagType;
-    case 4:
-      // Debug step four validation
-      console.log("Step 4 Validation:", {
-        reward_by_rank: values.reward_by_rank,
-        publication_type: values.publication_type,
-        influencer_amount: values.influencer_amount,
-        errors: errors,
-      });
-
-      // Check if we have publication type and influencer amount for automatic calculation
-      const hasValidPubType = values.publication_type && ["reels", "post", "story"].includes(values.publication_type);
-      const hasValidInfluencerAmount = values.influencer_amount > 0;
-
-      // Reward calculation is now automatic, so we just need the prerequisites
-      return hasValidPubType && hasValidInfluencerAmount;
-    case 5:
-      return (
-        !errors.is_bad_words_allowed &&
-        !errors.is_custom_text &&
-        (!values.is_custom_text || !errors.prepared_text) &&
-        values.content_ids?.length > 0
-      );
-    case 7:
-      // Debug step seven validation
-      console.log("Step 7 Validation:", {
-        amount: values.amount,
-        errors: errors,
-      });
-
-      // Check if amount is valid
-      const hasValidAmount = values.amount && values.amount > 0;
-
-      return hasValidAmount;
-    case 8:
-      // Debug step eight validation
-      console.log("Step 8 Validation:", {
-        card_number: values.card_number,
-        card_holder: values.card_holder,
-        cvc: values.cvc,
-        expiry_month: values.expiry_month,
-        expiry_year: values.expiry_year,
-        errors: errors,
-      });
-
-      // Check if all payment fields are filled
-      const hasValidCardNumber = values.card_number && values.card_number.length > 0;
-      const hasValidCardHolder = values.card_holder && values.card_holder.length > 0;
-      const hasValidCvc = values.cvc && values.cvc.length > 0;
-      const hasValidExpiryMonth = values.expiry_month && values.expiry_month.length > 0;
-      const hasValidExpiryYear = values.expiry_year && values.expiry_year.length > 0;
-
-      return (
-        hasValidCardNumber &&
-        hasValidCardHolder &&
-        hasValidCvc &&
-        hasValidExpiryMonth &&
-        hasValidExpiryYear
-      );
-    default:
-      return true;
-  }
-};
 
 const labels = [
   {
@@ -225,11 +86,97 @@ const formatDate = (dateString: string) => {
     .replace(/\./g, ".");
 };
 
+const isStepValid = (step: number, form: any) => {
+  const values = form.watch();
+  const errors = form.formState.errors;
+
+  // Define which fields to validate for each step
+  const stepFields = {
+    1: ['influencer_amount', 'category_ids', 'genders', 'branch_ids', 'images', 'about'],
+    2: ['start_date', 'end_date', 'work_hours_by_week_day', 'session_duration_sec', 'visit_at_same_time_count'],
+    3: ['publication_type', 'ad_format', 'tag_type'],
+    4: ['publication_type', 'influencer_amount'],
+    5: ['is_bad_words_allowed', 'is_custom_text', 'prepared_text', 'content_ids'],
+    6: [], // Preview step - no validation needed
+    7: ['amount'],
+    8: ['card_number', 'card_holder', 'cvc', 'expiry_month', 'expiry_year']
+  };
+
+  const fieldsToValidate = stepFields[step] || [];
+
+  // Check if any of the required fields for this step have errors
+  const hasStepErrors = fieldsToValidate.some(field => {
+    return errors[field];
+  });
+
+  // For step 1, check if all required fields have values
+  if (step === 1) {
+    const hasValidInfluencerAmount = values.influencer_amount > 0;
+    const hasValidCategoryIds = values.category_ids && values.category_ids.length > 0;
+    const hasValidGenders = values.genders && values.genders.length > 0;
+    const hasValidBranchIds = values.branch_ids && values.branch_ids.length > 0;
+    const hasValidImages = values.images && values.images.length > 0;
+    const hasValidAbout = values.about && (typeof values.about === 'string' ? values.about.trim().length > 0 : true);
+
+    return !hasStepErrors && hasValidInfluencerAmount && hasValidCategoryIds && hasValidGenders && hasValidBranchIds && hasValidImages && hasValidAbout;
+  }
+
+  // For step 2, check if all required fields have values
+  if (step === 2) {
+    const hasValidStartDate = values.start_date && (typeof values.start_date === 'string' ? values.start_date.trim().length > 0 : true);
+    const hasValidEndDate = values.end_date && (typeof values.end_date === 'string' ? values.end_date.trim().length > 0 : true);
+    const hasValidSessionDuration = values.session_duration_sec > 0;
+    const hasValidVisitCount = values.visit_at_same_time_count > 0;
+    const hasValidWorkHours = values.work_hours_by_week_day && Object.keys(values.work_hours_by_week_day).length > 0;
+
+    return !hasStepErrors && hasValidStartDate && hasValidEndDate && hasValidSessionDuration && hasValidVisitCount && hasValidWorkHours;
+  }
+
+  // For step 3, check if all required fields have values
+  if (step === 3) {
+    const hasValidPublicationType = values.publication_type && ["reels", "post", "story"].includes(values.publication_type);
+    const hasValidAdFormat = values.ad_format && ["image", "video", "reels"].includes(values.ad_format);
+    const hasValidTagType = values.tag_type && ["together_with_influencer", "separate"].includes(values.tag_type);
+
+    return !hasStepErrors && hasValidPublicationType && hasValidAdFormat && hasValidTagType;
+  }
+
+  // For step 4, also check if we have the prerequisites for automatic calculation
+  if (step === 4) {
+    const hasValidPubType = values.publication_type && ["reels", "post", "story"].includes(values.publication_type);
+    const hasValidInfluencerAmount = values.influencer_amount > 0;
+    return !hasStepErrors && hasValidPubType && hasValidInfluencerAmount;
+  }
+
+  // For step 5, also check if content_ids has values
+  if (step === 5) {
+    return !hasStepErrors && values.content_ids?.length > 0;
+  }
+
+  // For step 7, also check if amount is greater than 0
+  if (step === 7) {
+    return !hasStepErrors && values.amount > 0;
+  }
+
+  // For step 8, also check if all payment fields have values
+  if (step === 8) {
+    const hasValidCardNumber = values.card_number && values.card_number.length > 0;
+    const hasValidCardHolder = values.card_holder && values.card_holder.length > 0;
+    const hasValidCvc = values.cvc && values.cvc.length > 0;
+    const hasValidExpiryMonth = values.expiry_month && values.expiry_month.length > 0;
+    const hasValidExpiryYear = values.expiry_year && values.expiry_year.length > 0;
+
+    return !hasStepErrors && hasValidCardNumber && hasValidCardHolder && hasValidCvc && hasValidExpiryMonth && hasValidExpiryYear;
+  }
+
+  return !hasStepErrors;
+};
+
 export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(7);
+  const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
@@ -322,6 +269,8 @@ export default function AdsPage() {
     })
     console.log("res", res)
     if (res.statusCode === 200) {
+      form.reset();
+      setStep(1);
       return true;
     } else {
       return false;
@@ -366,8 +315,28 @@ export default function AdsPage() {
                   <Button
                     styles="w-full justify-center font-bold"
                     label={step === 8 ? "Оплатить и создать" : "Далее"}
+                    disabled={!isStepValid(step, form) || isSubmitting}
                     onClick={async () => {
                       if (isSubmitting) return; // Prevent multiple submissions
+
+                      // Trigger validation for current step fields
+                      const stepFields = {
+                        1: ['influencer_amount', 'category_ids', 'genders', 'branch_ids', 'images', 'about'],
+                        2: ['start_date', 'end_date', 'work_hours_by_week_day', 'session_duration_sec', 'visit_at_same_time_count'],
+                        3: ['publication_type', 'ad_format', 'tag_type'],
+                        4: ['publication_type', 'influencer_amount'],
+                        5: ['is_bad_words_allowed', 'is_custom_text', 'prepared_text', 'content_ids'],
+                        6: [], // Preview step - no validation needed
+                        7: ['amount'],
+                        8: ['card_number', 'card_holder', 'cvc', 'expiry_month', 'expiry_year']
+                      };
+
+                      const fieldsToValidate = stepFields[step] || [];
+                      const isValid = await form.trigger(fieldsToValidate);
+
+                      if (!isValid) {
+                        return; // Don't proceed if validation fails
+                      }
 
                       if (step === 8) {
                         try {
@@ -392,7 +361,6 @@ export default function AdsPage() {
                         setStep(step + 1);
                       }
                     }}
-                    disabled={!isStepValid(step, form) || isSubmitting}
                   />
                 </div>
                 <div className="flex justify-center items-center">{step}/8</div>

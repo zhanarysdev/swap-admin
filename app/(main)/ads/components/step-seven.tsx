@@ -3,7 +3,7 @@ import { Label } from "@/components/input/label";
 import { Spinner } from "@/components/spinner/spinner";
 import useProfile from "@/components/useProfile";
 import { useEffect, useState } from "react";
-import { PRICING_CONFIG } from "./pricing-config";
+import { PRICING_CONFIG, calculateTotalBudget } from "./pricing-config";
 import { Icon } from "@/components/icons";
 
 export const StepSeven = ({ form }) => {
@@ -11,19 +11,27 @@ export const StepSeven = ({ form }) => {
   const [showBudgetInfo, setShowBudgetInfo] = useState(false);
   const [calculatedBudget, setCalculatedBudget] = useState(0);
 
-  // Calculate budget based on form values
+  // Calculate budget based on form values using pricing configuration
   useEffect(() => {
     const publicationType = form.watch("publication_type");
     const influencerAmount = form.watch("influencer_amount");
-    const rewardByRank = form.watch("reward_by_rank");
 
-    if (rewardByRank && rewardByRank.length > 0) {
-      const total = rewardByRank.reduce((sum, reward) => {
-        return sum + (parseInt(reward.reward) || 0);
-      }, 0);
-      setCalculatedBudget(total);
+    if (publicationType && influencerAmount > 0) {
+      // Get all ranks from pricing config
+      const ranks = [
+        { name: "bronze" },
+        { name: "silver" },
+        { name: "gold" },
+        { name: "platinum" }
+      ];
+
+      // Calculate total budget using the same logic as Step Four
+      const totalBudget = calculateTotalBudget(publicationType, influencerAmount, ranks);
+      setCalculatedBudget(totalBudget);
+    } else {
+      setCalculatedBudget(0);
     }
-  }, [form.watch("reward_by_rank")]);
+  }, [form.watch("publication_type"), form.watch("influencer_amount")]);
 
   if (isLoading) return <Spinner />
 
@@ -32,7 +40,14 @@ export const StepSeven = ({ form }) => {
 
       <div className="flex flex-col gap-2 w-full">
         <Label label="Инфлюэнсеров" />
-        <Input value={form.watch("influencer_amount")} disabled />
+        <Input
+          {...form.register("influencer_amount", {
+            valueAsNumber: true,
+            onChange: (e) => form.setValue("influencer_amount", Number(e.target.value))
+          })}
+          type="number"
+          placeholder="Количество инфлюэнсеров"
+        />
       </div>
 
       <div className="flex flex-col gap-2 w-full">
