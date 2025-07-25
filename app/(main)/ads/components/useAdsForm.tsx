@@ -58,7 +58,7 @@ const schema = yup
           reward: yup.string().required("Вознаграждение обязательно"),
         })
       )
-      .required("Укажите вознаграждение по рангам"),
+      .optional(),
     session_duration_sec: yup
       .number()
       .min(0, "Длительность должна быть положительной")

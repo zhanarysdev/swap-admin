@@ -121,20 +121,17 @@ const isStepValid = (step: number, form: any) => {
       // Debug step four validation
       console.log("Step 4 Validation:", {
         reward_by_rank: values.reward_by_rank,
+        publication_type: values.publication_type,
+        influencer_amount: values.influencer_amount,
         errors: errors,
       });
 
-      // Check if reward_by_rank is valid - can be either string or array of reward objects
-      console.log(values.reward_by_rank);
-      const hasValidRewards =
-        values.reward_by_rank &&
-        Array.isArray(values.reward_by_rank) &&
-        values.reward_by_rank.length > 0 &&
-        values.reward_by_rank.every(
-          (reward) => reward.rank_id && reward.reward
-        );
+      // Check if we have publication type and influencer amount for automatic calculation
+      const hasValidPubType = values.publication_type && ["reels", "post", "story"].includes(values.publication_type);
+      const hasValidInfluencerAmount = values.influencer_amount > 0;
 
-      return hasValidRewards;
+      // Reward calculation is now automatic, so we just need the prerequisites
+      return hasValidPubType && hasValidInfluencerAmount;
     case 5:
       return (
         !errors.is_bad_words_allowed &&
@@ -232,7 +229,7 @@ export default function AdsPage() {
   const form = useAdForm();
   const { setContext } = useContext(TableContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(7);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
@@ -266,6 +263,11 @@ export default function AdsPage() {
 
   const onSubmit = async (data: AdFormData) => {
     try {
+      // Calculate total budget from reward_by_rank
+      const totalBudget = data.reward_by_rank?.reduce((sum, reward) => {
+        return sum + (parseInt(reward.reward) || 0);
+      }, 0) || 0;
+
       const response = await post({
         url: "business/v1/task/create",
         custom: true,
@@ -292,7 +294,7 @@ export default function AdsPage() {
           visit_at_same_time_count: Number(data.visit_at_same_time_count),
           work_hours_by_week_day: data.work_hours_by_week_day,
           tag_business_required: true,
-          budget: 0,
+          budget: totalBudget,
         },
       });
       console.log("response", response);

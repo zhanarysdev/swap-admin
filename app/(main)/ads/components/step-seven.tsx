@@ -3,11 +3,27 @@ import { Label } from "@/components/input/label";
 import { Spinner } from "@/components/spinner/spinner";
 import useProfile from "@/components/useProfile";
 import { useEffect, useState } from "react";
-import { Modal } from "@/components/modal/modal";
-export const StepSeven = ({ form }) => {
+import { PRICING_CONFIG } from "./pricing-config";
+import { Icon } from "@/components/icons";
 
+export const StepSeven = ({ form }) => {
   const { profile, isLoading, isError, mutate } = useProfile();
   const [showBudgetInfo, setShowBudgetInfo] = useState(false);
+  const [calculatedBudget, setCalculatedBudget] = useState(0);
+
+  // Calculate budget based on form values
+  useEffect(() => {
+    const publicationType = form.watch("publication_type");
+    const influencerAmount = form.watch("influencer_amount");
+    const rewardByRank = form.watch("reward_by_rank");
+
+    if (rewardByRank && rewardByRank.length > 0) {
+      const total = rewardByRank.reduce((sum, reward) => {
+        return sum + (parseInt(reward.reward) || 0);
+      }, 0);
+      setCalculatedBudget(total);
+    }
+  }, [form.watch("reward_by_rank")]);
 
   if (isLoading) return <Spinner />
 
@@ -26,7 +42,7 @@ export const StepSeven = ({ form }) => {
 
       <div className="flex flex-col gap-2 w-full">
         <div className="flex items-center justify-between w-full">
-          <Label label="Бюджет кампании" />
+          <Label label="Рассчитанный бюджет кампании" />
           <span
             className="text-sm text-[#AAAAAA] cursor-pointer hover:underline"
             onClick={() => setShowBudgetInfo(true)}
@@ -34,7 +50,7 @@ export const StepSeven = ({ form }) => {
             Как определяется бюджет?
           </span>
         </div>
-        <Input value={"От 10000тг до 1000000тг"} disabled />
+        <Input value={`${calculatedBudget.toLocaleString()}₸`} disabled />
       </div>
 
       <div className="flex flex-col gap-2 w-full">
@@ -50,20 +66,70 @@ export const StepSeven = ({ form }) => {
       </div>
 
       {showBudgetInfo && (
-        <Modal label="Как определяется бюджет" close={() => setShowBudgetInfo(false)}>
-          <div className="text-base text-[#AAAAAA] mb-4">
-            В зависимости от бюджета рекламной кампании наши алгоритмы определяют наиболее эффективное сотрудничество с инфлюэнсерами разных рейтингов.<br /><br />
-            Например: при запуске кампании на указанную максимальную сумму мы стараемся подобрать инфлюэнсеров статуса "платина". В случае неподбора мы предлагаем ваши условия среди блогеров статуса "золото" и так далее пока не закроем запрашиваемое количество инфлюэнсеров. Остаток бюджета будет возвращен на баланс согласно тарифу.
+        <div className="fixed top-0 left-0 bottom-0 right-0 flex justify-center items-center backdrop-blur-sm bg-[rgba(0,0,0,0.2)] z-50">
+          <div className="relative bg-black p-6 rounded-[32px] z-50 min-w-[656px] max-w-[656px] w-full flex flex-col gap-8">
+            <div className="flex justify-between items-center">
+              <div className="text-2xl font-bold leading-7">Как определяется бюджет</div>
+              <Icon name="Close" onClick={() => setShowBudgetInfo(false)} className="cursor-pointer" />
+            </div>
+            <div>
+              <div className="text-base text-[#AAAAAA] mb-4">
+                Бюджет автоматически рассчитывается на основе выбранного типа контента и количества инфлюэнсеров.<br /><br />
+                <strong>Порядок стоимости:</strong> Reels {'>'} Post {'>'} Stories<br />
+                <strong>Комиссия платформы:</strong> 35% от базовой стоимости
+              </div>
+
+              <div className="mb-4">
+                <div className="mb-2 font-semibold">Таблица ценообразования</div>
+                <div className="space-y-2">
+                  <div className="bg-[#232323] rounded-xl p-3">
+                    <div className="font-medium mb-2">Бронза</div>
+                    <div className="text-sm space-y-1">
+                      <div>Reels: 12,000₸ + комиссия 4,200₸ = 16,200₸</div>
+                      <div>Post: 8,400₸ + комиссия 2,940₸ = 11,340₸</div>
+                      <div>Stories: 6,000₸ + комиссия 2,100₸ = 8,100₸</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#232323] rounded-xl p-3">
+                    <div className="font-medium mb-2">Серебро</div>
+                    <div className="text-sm space-y-1">
+                      <div>Reels: 20,000₸ + комиссия 7,000₸ = 27,000₸</div>
+                      <div>Post: 14,000₸ + комиссия 4,900₸ = 18,900₸</div>
+                      <div>Stories: 10,000₸ + комиссия 3,500₸ = 13,500₸</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#232323] rounded-xl p-3">
+                    <div className="font-medium mb-2">Золото</div>
+                    <div className="text-sm space-y-1">
+                      <div>Reels: 36,000₸ + комиссия 12,600₸ = 48,600₸</div>
+                      <div>Post: 25,200₸ + комиссия 8,820₸ = 34,020₸</div>
+                      <div>Stories: 18,000₸ + комиссия 6,300₸ = 24,300₸</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#232323] rounded-xl p-3">
+                    <div className="font-medium mb-2">Платина</div>
+                    <div className="text-sm space-y-1">
+                      <div>Reels: 60,000₸ + комиссия 21,000₸ = 81,000₸</div>
+                      <div>Post: 42,000₸ + комиссия 14,700₸ = 56,700₸</div>
+                      <div>Stories: 30,000₸ + комиссия 10,500₸ = 40,500₸</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-3">
+                <div className="text-sm text-blue-300">
+                  <strong>Примечание:</strong> Вы не платите блогеру напрямую. Вы предоставляете продукт
+                  или услугу на сумму, указанную выше, а SWAPP берет фиксированную комиссию за подбор,
+                  автоматизацию и сопровождение кампании.
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mb-2 font-semibold">Тариф</div>
-          <div className="grid grid-cols-2 gap-2 mb-2">
-            <div className="bg-[#232323] rounded-xl px-4 py-2">Бронзовый 4000 тг</div>
-            <div className="bg-[#232323] rounded-xl px-4 py-2">Серебряный 6000 тг</div>
-            <div className="bg-[#232323] rounded-xl px-4 py-2">Золотой 10000 тг</div>
-            <div className="bg-[#232323] rounded-xl px-4 py-2">Платина 20000 тг</div>
-          </div>
-          <div className="text-right text-xs text-[#AAAAAA] cursor-pointer hover:underline">Как определяется рейтинг?</div>
-        </Modal>
+        </div>
       )}
     </div>
   );
