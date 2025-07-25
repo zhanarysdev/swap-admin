@@ -52,6 +52,8 @@ const isStepValid = (step: number, form: any) => {
         values.genders?.length > 0 &&
         values.branch_ids?.length > 0 &&
         values.images?.length > 0;
+      values.about.length > 0
+
 
       console.log("Step 1 Validation:", {
         influencer_amount: values.influencer_amount > 0,
@@ -65,6 +67,7 @@ const isStepValid = (step: number, form: any) => {
           genders: values.genders,
           branch_ids: values.branch_ids,
           images: values.images,
+          about: values.about,
         },
       });
 
@@ -258,6 +261,8 @@ export default function AdsPage() {
       },
     }));
   }, [data]);
+
+  console.log(form.getValues())
 
   const onSubmit = async (data: AdFormData) => {
     try {

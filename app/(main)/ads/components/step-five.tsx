@@ -13,7 +13,6 @@ export const StepFive = ({ form }) => {
   const clothes = useSWR({ url: "clothes/list", data: { search: "", "sort_by": "name", "sort_dir": "asc" } }, post)
   const content = useSWR({ url: "content/list", data: { search: "", "sort_by": "name", "sort_dir": "asc" } }, post)
   if (clothes.isLoading || content.isLoading) return <Spinner />
-  console.log(content.data)
 
 
   return (
@@ -28,6 +27,7 @@ export const StepFive = ({ form }) => {
                 <Button
                   key={el.id}
                   label={el.name}
+                  type="button"
                   styles="w-full items-center justify-center"
                   bg={
                     form.watch("clothing_type_id") === el.id
@@ -51,6 +51,7 @@ export const StepFive = ({ form }) => {
           <div className="flex gap-2">
             <Button
               label="Произв. положительный отзыв"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 form.watch("custom_text") === "Произв. положительный отзыв"
@@ -64,6 +65,7 @@ export const StepFive = ({ form }) => {
             />
             <Button
               label="Подготовленный текст"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 typeof form.watch("prepared_text") === "string" && form.watch("prepared_text") !== ""
@@ -86,6 +88,7 @@ export const StepFive = ({ form }) => {
                   count={typeof field.value === "string" ? field.value.length : 0}
                   maxCount={150}
                   onChange={(e) => {
+                    console.log("-------->", e.target.value);
                     field.onChange(e.target.value)
                   }}
                 />
@@ -99,6 +102,7 @@ export const StepFive = ({ form }) => {
           <div className="flex gap-2">
             <Button
               label="Допустима"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 form.watch("is_bad_words_allowed")
@@ -114,6 +118,7 @@ export const StepFive = ({ form }) => {
             />
             <Button
               label="Не допустима"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 form.watch("is_bad_words_allowed")
@@ -137,6 +142,7 @@ export const StepFive = ({ form }) => {
                 <Button
                   key={el.id}
                   label={el.name}
+                  type="button"
                   bg={
                     form.watch("content_ids")?.includes(el.id)
                       ? ButtonBG.primary

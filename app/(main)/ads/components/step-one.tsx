@@ -136,6 +136,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
         <div className="flex gap-2">
           <Button
             label="Мужчина"
+            type="button"
             styles="w-full items-center justify-center"
             bg={
               form.watch("genders").includes("male")
@@ -153,6 +154,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
           />
           <Button
             label="Женщина"
+            type="button"
             styles="w-full items-center justify-center"
             bg={
               form.watch("genders").includes("female")
@@ -198,7 +200,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
                 maxCount={300}
                 value={String(field.value)}
                 onChange={(e) => {
-                  field.onChange(e);
+                  field.onChange(e.target.value);
                   setCount(e.target.value.length);
                 }}
               />

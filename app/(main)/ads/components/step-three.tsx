@@ -11,6 +11,7 @@ export const StepThree = ({ form }) => {
           <div className="flex gap-2">
             <Button
               label="Post"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 form.watch("publication_type") === "post"
@@ -26,6 +27,7 @@ export const StepThree = ({ form }) => {
             />
             <Button
               label="Story"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 form.watch("publication_type") === "story"
@@ -41,6 +43,7 @@ export const StepThree = ({ form }) => {
             />
             <Button
               label="Reels"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 form.watch("publication_type") === "reels"
@@ -61,6 +64,7 @@ export const StepThree = ({ form }) => {
           <div className="flex gap-2">
             <Button
               label="Фото"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 form.watch("ad_format") === "image"
@@ -76,6 +80,7 @@ export const StepThree = ({ form }) => {
             />
             <Button
               label="Видео"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 form.watch("ad_format") === "video"
@@ -96,6 +101,7 @@ export const StepThree = ({ form }) => {
           <div className="flex gap-2">
             <Button
               label="Совместно"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 form.watch("tag_type") === "together_with_influencer"
@@ -113,6 +119,7 @@ export const StepThree = ({ form }) => {
             />
             <Button
               label="Одиночное"
+              type="button"
               styles="w-full items-center justify-center"
               bg={
                 form.watch("tag_type") === "separate"

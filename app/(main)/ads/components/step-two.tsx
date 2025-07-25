@@ -118,6 +118,7 @@ export const StepTwo = ({ form }) => {
           <div className="flex gap-2 relative">
             <Button
               label={formatDateForDisplay(form.watch("start_date")) || "Начало"}
+              type="button"
               preIcon={<Icon name="Calendar" className={`${form.watch("start_date") ? "text-black" : "text-[#AAAAAA]"}`} />}
               styles="w-full items-center justify-center"
               bg={
@@ -156,6 +157,7 @@ export const StepTwo = ({ form }) => {
             )}
             <Button
               label={formatDateForDisplay(form.watch("end_date")) || "Конец"}
+              type="button"
               preIcon={<Icon name="Calendar" className={`${form.watch("end_date") ? "text-black" : "text-[#AAAAAA]"}`} />}
               styles="w-full items-center justify-center"
               bg={
