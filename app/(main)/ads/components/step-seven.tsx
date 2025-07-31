@@ -9,27 +9,24 @@ import { Icon } from "@/components/icons";
 export const StepSeven = ({ form }) => {
   const { profile, isLoading, isError, mutate } = useProfile();
   const [showBudgetInfo, setShowBudgetInfo] = useState(false);
-  const [calculatedBudget, setCalculatedBudget] = useState(0);
+  const [calculatedBudget, setCalculatedBudget] = useState({ min: 0, max: 0 });
 
-  // Calculate budget based on form values using pricing configuration
+  // Calculate budget range based on form values
   useEffect(() => {
     const publicationType = form.watch("publication_type");
     const influencerAmount = form.watch("influencer_amount");
 
     if (publicationType && influencerAmount > 0) {
-      // Get all ranks from pricing config
-      const ranks = [
-        { name: "bronze" },
-        { name: "silver" },
-        { name: "gold" },
-        { name: "platinum" }
-      ];
+      // Calculate range: Bronze to Platinum bloggers based on user input
+      const bronzePrice = PRICING_CONFIG.bronze[publicationType]?.total || 0;
+      const platinumPrice = PRICING_CONFIG.platinum[publicationType]?.total || 0;
 
-      // Calculate total budget using the same logic as Step Four
-      const totalBudget = calculateTotalBudget(publicationType, influencerAmount, ranks);
-      setCalculatedBudget(totalBudget);
+      const minBudget = bronzePrice * influencerAmount; // Bronze bloggers
+      const maxBudget = platinumPrice * influencerAmount; // Platinum bloggers
+
+      setCalculatedBudget({ min: minBudget, max: maxBudget });
     } else {
-      setCalculatedBudget(0);
+      setCalculatedBudget({ min: 0, max: 0 });
     }
   }, [form.watch("publication_type"), form.watch("influencer_amount")]);
 
@@ -65,7 +62,7 @@ export const StepSeven = ({ form }) => {
             Как определяется бюджет?
           </span>
         </div>
-        <Input value={`${calculatedBudget.toLocaleString()}₸`} disabled />
+        <Input value={`${calculatedBudget.min.toLocaleString()}₸ - ${calculatedBudget.max.toLocaleString()}₸`} disabled />
       </div>
 
       <div className="flex flex-col gap-2 w-full">
@@ -89,9 +86,10 @@ export const StepSeven = ({ form }) => {
             </div>
             <div>
               <div className="text-base text-[#AAAAAA] mb-4">
-                Бюджет автоматически рассчитывается на основе выбранного типа контента и количества инфлюэнсеров.<br /><br />
+                Бюджет рассчитывается как диапазон от указанного количества блогеров бронзового уровня до того же количества блогеров платинового уровня.<br /><br />
                 <strong>Порядок стоимости:</strong> Reels {'>'} Post {'>'} Stories<br />
-                <strong>Комиссия платформы:</strong> 35% от базовой стоимости
+                <strong>Комиссия платформы:</strong> 35% от базовой стоимости<br />
+                <strong>Диапазон:</strong> От бронзовых до платиновых блогеров (количество зависит от вашего ввода)
               </div>
 
               <div className="mb-4">

@@ -232,7 +232,7 @@ export default function AdsPage() {
           influencer_amount: Number(data.influencer_amount),
           is_bad_words_allowed: data.is_bad_words_allowed,
           is_custom_text: data.is_custom_text,
-          prepared_text: data.is_custom_text ? data.prepared_text : "",
+          prepared_text: form.watch("is_custom_text") ? form.watch("prepared_text") : "",
           publication_type: data.publication_type,
           reward_by_rank: data.reward_by_rank,
           session_duration_sec: Number(data.session_duration_sec),

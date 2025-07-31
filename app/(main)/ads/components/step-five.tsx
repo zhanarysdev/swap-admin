@@ -136,7 +136,7 @@ export const StepFive = ({ form }) => {
         </div>
         <div className="flex flex-col gap-2 w-full">
           <Label label="Тип контента" />
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {
               content.data.result.length > 0 && content.data.result.map((el) => (
                 <Button
@@ -155,7 +155,7 @@ export const StepFive = ({ form }) => {
                       : [...currentContentIds, el.id];
                     form.setValue("content_ids", newContentIds);
                   }}
-                  styles="w-full items-center justify-center"
+                  styles="w-full items-center justify-center max-w-[104px]"
                 />
               ))
             }
