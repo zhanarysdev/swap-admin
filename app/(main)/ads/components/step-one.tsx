@@ -18,7 +18,7 @@ const ImageUploader = ({ value, onChange }: { value: string[], onChange: (urls: 
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('https://swapp-admin-stg-414022925388.us-central1.run.app/api/v1/image/upload', {
+      const response = await fetch('https://admin.swapp.kz/api/v1/image/upload', {
         method: 'POST',
         body: formData,
       });
