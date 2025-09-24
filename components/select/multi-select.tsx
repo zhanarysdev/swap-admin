@@ -48,10 +48,13 @@ export const MultiSelect = ({
             value={curValue}
             className={`cursor-pointer py-[1px] text-base leading-5 font-medium ${disabled ? "text-[#aaa]" : ""}`}
           >
-            {curValue
-              .map((val) => options.find((el) => el.value === val)?.label)
-              .filter(Boolean)
-              .join(", ")}
+            {curValue.length > 0
+              ? curValue
+                .map((val) => options.find((el) => el.value === val)?.label)
+                .filter(Boolean)
+                .join(", ")
+              : "Выберите опции"
+            }
           </option>
         </div>
 

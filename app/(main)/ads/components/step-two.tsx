@@ -4,7 +4,7 @@ import { InputCalendar } from "@/components/input/input-calendar";
 import { Label } from "@/components/input/label";
 import { ScheduleModal } from "@/components/input/schedule-modal";
 import { Select } from "@/components/select/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Controller } from "react-hook-form";
 
 export const weekDaysMap: { [key: string]: string } = {
@@ -80,6 +80,27 @@ export const StepTwo = ({ form }) => {
   const [editingTime, setEditingTime] = useState<{ day: string; type: 'open' | 'close' } | null>(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
+  // Debug: Log current form values to help identify validation issues
+  const currentValues = form.watch();
+  console.log('Step 2 Form Values:', currentValues);
+  console.log('Step 2 Form Errors:', form.formState.errors);
+
+  // Ensure work hours are properly initialized
+  useEffect(() => {
+    const workHours = form.getValues("work_hours_by_week_day");
+    if (!workHours || Object.keys(workHours).length === 0) {
+      form.setValue("work_hours_by_week_day", {
+        monday: { open: "09:00", close: "18:00" },
+        tuesday: { open: "09:00", close: "18:00" },
+        wednesday: { open: "09:00", close: "18:00" },
+        thursday: { open: "09:00", close: "18:00" },
+        friday: { open: "09:00", close: "18:00" },
+        saturday: { open: "09:00", close: "18:00" },
+        sunday: { open: "09:00", close: "18:00" },
+      });
+    }
+  }, [form]);
+
   const handleTimeChange = (day: string, type: 'open' | 'close', value: string) => {
     const currentHours = form.getValues("work_hours_by_week_day") || {};
     form.setValue("work_hours_by_week_day", {
@@ -112,6 +133,29 @@ export const StepTwo = ({ form }) => {
 
   return (
     <div className="flex gap-6 ">
+      {/* Debug panel - remove this after fixing */}
+      <div className="fixed top-4 right-4 bg-black/80 text-white p-4 rounded-lg text-xs z-50 max-w-xs">
+        <h3 className="font-bold mb-2">Step 2 Validation Debug:</h3>
+        <div>Start Date: {currentValues.start_date ? '✅' : '❌'}</div>
+        <div>End Date: {currentValues.end_date ? '✅' : '❌'}</div>
+        <div>Session Duration: {currentValues.session_duration_sec} {currentValues.session_duration_sec > 0 ? '✅' : '❌'}</div>
+        <div>Visit Count: {currentValues.visit_at_same_time_count} {currentValues.visit_at_same_time_count > 0 ? '✅' : '❌'}</div>
+        <div>Work Hours: {Object.keys(currentValues.work_hours_by_week_day || {}).length} days {Object.keys(currentValues.work_hours_by_week_day || {}).length > 0 ? '✅' : '❌'}</div>
+        <div className="mt-2 text-xs">
+          Work Hours Details:
+          {Object.entries(currentValues.work_hours_by_week_day || {}).map(([day, hours]) => (
+            <div key={day} className="ml-2">
+              {day}: {hours?.open || '00:00'} - {hours?.close || '00:00'}
+            </div>
+          ))}
+        </div>
+        {Object.keys(form.formState.errors).length > 0 && (
+          <div className="mt-2 text-red-400">
+            Errors: {Object.keys(form.formState.errors).join(', ')}
+          </div>
+        )}
+      </div>
+
       <div className="flex flex-col gap-4 w-[342px] shrink-0">
         <div className="flex flex-col gap-2 w-full">
           <Label label="Дата" />
@@ -135,19 +179,6 @@ export const StepTwo = ({ form }) => {
                   onChange={(date) => {
                     if (date) {
                       form.setValue("start_date", date);
-                      // Update work hours open time
-                      const timeString = formatDate(date);
-                      if (timeString) {
-                        const currentHours = form.getValues("work_hours_by_week_day") || {};
-                        const newHours = Object.keys(currentHours).reduce((acc, day) => ({
-                          ...acc,
-                          [day]: {
-                            ...currentHours[day],
-                            open: timeString
-                          }
-                        }), {});
-                        form.setValue("work_hours_by_week_day", newHours);
-                      }
                     }
                     setShowStartCalendar(false);
                   }}
@@ -174,19 +205,6 @@ export const StepTwo = ({ form }) => {
                   onChange={(date) => {
                     if (date) {
                       form.setValue("end_date", date);
-                      // Update work hours close time
-                      const timeString = formatDate(date);
-                      if (timeString) {
-                        const currentHours = form.getValues("work_hours_by_week_day") || {};
-                        const newHours = Object.keys(currentHours).reduce((acc, day) => ({
-                          ...acc,
-                          [day]: {
-                            ...currentHours[day],
-                            close: timeString
-                          }
-                        }), {});
-                        form.setValue("work_hours_by_week_day", newHours);
-                      }
                     }
                     setShowEndCalendar(false);
                   }}
@@ -211,7 +229,7 @@ export const StepTwo = ({ form }) => {
                   { label: "4 часа", value: "4" },
                   { label: "8 часов", value: "8" },
                 ]}
-                onChange={field.onChange}
+                onChange={(value) => field.onChange(parseInt(value))}
               />
             )}
           />
@@ -231,7 +249,7 @@ export const StepTwo = ({ form }) => {
                   { label: "4", value: "4" },
                   { label: "8", value: "8" },
                 ]}
-                onChange={field.onChange}
+                onChange={(value) => field.onChange(parseInt(value))}
               />
             )}
           />

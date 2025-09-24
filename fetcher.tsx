@@ -62,6 +62,22 @@ if (typeof window !== "undefined") {
   }
 }
 
+// Utility function to set token in both localStorage and cookies
+export const setAuthToken = (token: string) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("token", token);
+    document.cookie = `token=${token}; path=/; max-age=2592000; SameSite=Strict`;
+  }
+};
+
+// Utility function to clear token from both localStorage and cookies
+export const clearAuthToken = () => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("token");
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  }
+};
+
 export const fetcher = async ({
   url,
   custom,

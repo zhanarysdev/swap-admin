@@ -5,7 +5,7 @@ import { Input } from "@/components/input/input";
 import { InputPhone } from "@/components/input/input-phone";
 import { Select } from "@/components/select/select";
 import { Spinner } from "@/components/spinner/spinner";
-import { post, fetcher } from "@/fetcher";
+import { post, fetcher, setAuthToken } from "@/fetcher";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -61,8 +61,7 @@ export function Form({ setPageState, verificationToken, password }: {
 
             if (response.token) {
                 // Redirect to dashboard or login page after successful signup
-                localStorage?.setItem("token", response.token);
-                document.cookie = `token=${response.token}; path=/; max-age=2592000; SameSite=Strict`;
+                setAuthToken(response.token);
                 router.push('/ads');
             } else {
                 // Handle error response
@@ -83,11 +82,34 @@ export function Form({ setPageState, verificationToken, password }: {
         custom: true
     }, post)
 
-    const cities = useSWR({
-        url: "city/list",
-    }, fetcher)
+    const cities = [
+        {
+            "id": "24a36f7e-7e5a-4457-9f8e-e18851e135ad",
+            "name": {
+                "en": "Алматы",
+                "kz": "Алматы",
+                "ru": "Алматы"
+            }
+        },
+        {
+            "id": "24a36f7e-7e5a-4457-9f8e-e18851e135ad",
+            "name": {
+                "en": "Шымкент",
+                "kz": "Шымкент",
+                "ru": "Шымкент"
+            }
+        },
+        {
+            "id": "24a36f7e-7e5a-4457-9f8e-e18851e135ad",
+            "name": {
+                "en": "Астана",
+                "kz": "Астана",
+                "ru": "Астана"
+            }
+        },
+    ]
 
-    if (isLoading || cities.isLoading) {
+    if (isLoading || cities.length === 0) {
         return <Spinner />
     }
 
@@ -144,7 +166,7 @@ export function Form({ setPageState, verificationToken, password }: {
                         <Select
                             data={value}
                             placeholder="Город"
-                            options={cities.data.result.map((item: any) => ({ label: item.name?.ru, value: item.id }))}
+                            options={cities.map((item: any) => ({ label: item.name?.ru, value: item.id }))}
                             onChange={(val) => onChange(val)}
                         />
                     )}

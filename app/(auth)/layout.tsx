@@ -2,12 +2,20 @@
 import { Icon } from "@/components/icons";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, ReactNode } from "react";
+import { useAuth } from "@/components/auth-context";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  console.log(pathname);
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push('/ads');
+    }
+  }, [isAuthenticated, isLoading, router]);
   return (
     <div className="flex h-full  bg-[#212121]">
       <div className="relative flex-1">
@@ -22,7 +30,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <Link href={pathname === "/signup" ? "/login" : "/signup"} className="prose-sm text-white text-[18px] leading-[22px] font-[600]">
               {pathname === "/signup" ? "Вход в личный кабинет" : "Создать аккаунт"}
             </Link>
-            <Icon name="Arrow"  className="mt-[3px]"/>
+            <Icon name="Arrow" className="mt-[3px]" />
           </div>
         </div>
         <div className="flex justify-center">{children}</div>

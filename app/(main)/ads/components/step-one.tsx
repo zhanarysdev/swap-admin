@@ -84,6 +84,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
   const [count, setCount] = useState(0);
   const { profile, isLoading: isProfileLoading } = useProfile();
 
+
   const { data, isLoading } = useSWR(
     {
       url: "categories",
@@ -110,7 +111,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
                   { label: "10 блогеров", value: "10" },
                   { label: "15 блогеров", value: "15" },
                 ]}
-                onChange={field.onChange}
+                onChange={(value) => field.onChange(parseInt(value))}
               />
             )}
           />
@@ -173,8 +174,8 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
             }}
           />
         </div>
-        {console.log(profile?.branches)}
         <div className="flex flex-col gap-2">
+          <Label label="Филиалы" />
           <Controller
             control={form.control}
             name="branch_ids"

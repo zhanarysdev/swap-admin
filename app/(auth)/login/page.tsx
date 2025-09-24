@@ -3,7 +3,7 @@ import { Button, ButtonBG } from "@/components/button/button";
 import { Icon } from "@/components/icons";
 import { Input } from "@/components/input/input";
 import { InputPhone } from "@/components/input/input-phone";
-import { post } from "@/fetcher";
+import { post, setAuthToken } from "@/fetcher";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,7 +21,7 @@ export default function Login() {
       custom: true,
     });
     if (res.statusCode === 200) {
-      localStorage.setItem("token", res.result.token);
+      setAuthToken(res.result.token);
       push("/");
     }
   };
