@@ -143,11 +143,14 @@ export const StepTwo = ({ form }) => {
         <div>Work Hours: {Object.keys(currentValues.work_hours_by_week_day || {}).length} days {Object.keys(currentValues.work_hours_by_week_day || {}).length > 0 ? '✅' : '❌'}</div>
         <div className="mt-2 text-xs">
           Work Hours Details:
-          {Object.entries(currentValues.work_hours_by_week_day || {}).map(([day, hours]) => (
-            <div key={day} className="ml-2">
-              {day}: {hours?.open || '00:00'} - {hours?.close || '00:00'}
-            </div>
-          ))}
+          {Object.entries(currentValues.work_hours_by_week_day || {}).map(([day, hours]) => {
+            const typedHours = hours as WorkHours;
+            return (
+              <div key={day} className="ml-2">
+                {day}: {typedHours?.open || '00:00'} - {typedHours?.close || '00:00'}
+              </div>
+            );
+          })}
         </div>
         {Object.keys(form.formState.errors).length > 0 && (
           <div className="mt-2 text-red-400">
