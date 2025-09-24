@@ -173,6 +173,7 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
             }}
           />
         </div>
+        {console.log(profile?.branches)}
         <div className="flex flex-col gap-2">
           <Controller
             control={form.control}
@@ -180,10 +181,10 @@ export const StepOne = ({ form }: { form: UseFormReturn<AdFormData> }) => {
             render={({ field }) => (
               <MultiSelect
                 data={field.value}
-                options={profile?.branches.map((el) => ({
+                options={profile?.branches?.map((el) => ({
                   label: el.address,
                   value: el.id,
-                }))}
+                })) || []}
                 onChange={field.onChange}
               />
             )}
